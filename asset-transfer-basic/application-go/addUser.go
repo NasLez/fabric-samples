@@ -54,7 +54,7 @@ func addUserToWallet(wallet *gateway.Wallet, username string) error {
 		"peerOrganizations",
 		"org1.example.com",
 		"users",
-		username,
+		"User1@org1.example.com",
 		"msp",
 	)
 
