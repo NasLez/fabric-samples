@@ -125,7 +125,7 @@ type Ebl struct {
 	DateOfIssue            int64   `json:"dateOfIssue"`
 	DeliveryAgent          string  `json:"deliveryAgent"`
 	ShippedOnBoard         int64   `json:"shippedOnBoard"`
-	NumOfEBL               int     `json:"numOfEbl"`
+	NumOfEBL               int64   `json:"numOfEbl"`
 	DateOfIssueDeadline    int64   `json:"dateOfIssueDeadline"`
 	Status                 string  `json:"status"`
 	File                   string  `json:"fileHash"`
@@ -196,7 +196,44 @@ func (t *SimpleChaincode) CreateAsset(ctx contractapi.TransactionContextInterfac
 }
 
 // CreateEbl initializes a new EBL (Electronic Bill of Lading) in the ledger
-func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface, eblNo, originCompanyID, originCompanyName, shipperCompanyID, shipperCompanyName, consigneeCompanyID, consigneeCompanyName, notifyPartyCompanyID, notifyPartyCompanyName, placeOfReceipt, oceanVessel, portOfLoading, portOfDescharge, placeOfDestination, placeOfDelivery, shippingMarkes string, quantityOfPackages float64, kindOfPackagesGW, kindOfPackagesM, descriptionOfGoods string, grossWeight, measurement float64, freightAndCharges, placeOfIssue string, dateOfIssue int64, deliveryAgent string, shippedOnBoard int64, numOfEBL int, dateOfIssueDeadline int64, status, file string, contractFiles, invoiceFiles string, transferCompanyID, transferCompanyName string, companyName string, companyID int64) error {
+func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface,
+	eblNo,
+	originCompanyID,
+	originCompanyName,
+	shipperCompanyID,
+	shipperCompanyName,
+	consigneeCompanyID,
+	consigneeCompanyName,
+	notifyPartyCompanyID,
+	notifyPartyCompanyName,
+	placeOfReceipt,
+	oceanVessel,
+	portOfLoading,
+	portOfDescharge,
+	placeOfDestination,
+	placeOfDelivery,
+	shippingMarkes,
+	contractFiles,
+	invoiceFiles,
+	transferCompanyID,
+	transferCompanyName,
+	kindOfPackagesGW,
+	kindOfPackagesM,
+	descriptionOfGoods,
+	deliveryAgent,
+	companyName,
+	freightAndCharges,
+	status,
+	file,
+	placeOfIssue string,
+	quantityOfPackages,
+	grossWeight,
+	measurement float64,
+	dateOfIssue,
+	shippedOnBoard,
+	numOfEBL,
+	dateOfIssueDeadline,
+	companyID int64) error {
 	// Check if the EBL already exists
 	exists, err := t.EblExists(ctx, eblNo)
 	if err != nil {
