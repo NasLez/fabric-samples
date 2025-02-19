@@ -6,7 +6,12 @@ import (
 	"fabric_ebl/domain/converter"
 	"fabric_ebl/repo"
 	"fabric_ebl/sal/jwt"
+	"fmt"
+	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
+	"io/ioutil"
+	"log"
+	"path/filepath"
 
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/wxl-server/idl_gen/kitex_gen/common_user"
@@ -130,7 +135,67 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 		logger.CtxErrorf(ctx, "CreateUser failed, err = %v", err)
 		return nil, err
 	}
+	{
+		wallet, err := gateway.NewFileSystemWallet("wallet")
+		if err != nil {
+			log.Fatalf("Failed to create wallet: %v", err)
+		}
+
+		walletName := req.CompanyName + "_" + req.AdminName
+		// Check if the wallet contains the identity for the provided username
+		if !wallet.Exists(walletName) {
+			err = addUserToWallet(wallet, walletName)
+			if err != nil {
+				log.Fatalf("Failed to populate wallet contents: %v", err)
+			}
+		}
+
+	}
+
 	return &fabric_ebl.CreateCompanyResp{
 		Id: userId,
 	}, nil
+}
+
+func addUserToWallet(wallet *gateway.Wallet, username string) error {
+	log.Println("============ Populating wallet for user:", username, "===========")
+	credPath := filepath.Join(
+		"..",
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"users",
+		"User1@org1.example.com",
+		"msp",
+	)
+
+	certPath := filepath.Join(credPath, "signcerts", "cert.pem")
+	// Read the certificate PEM
+	cert, err := ioutil.ReadFile(filepath.Clean(certPath))
+	if err != nil {
+		return err
+	}
+
+	keyDir := filepath.Join(credPath, "keystore")
+	// There's a single file in this directory containing the private key
+	files, err := ioutil.ReadDir(keyDir)
+	if err != nil {
+		return err
+	}
+	if len(files) != 1 {
+		return fmt.Errorf("keystore folder should have exactly one file")
+	}
+	keyPath := filepath.Join(keyDir, files[0].Name())
+	key, err := ioutil.ReadFile(filepath.Clean(keyPath))
+	if err != nil {
+		return err
+	}
+
+	identity := gateway.NewX509Identity("Org1MSP", string(cert), string(key))
+
+	// Store the identity in the wallet under the provided username
+	return wallet.Put(username, identity)
 }
