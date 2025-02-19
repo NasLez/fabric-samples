@@ -35,3 +35,8 @@ func _createcompanyMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getuserinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

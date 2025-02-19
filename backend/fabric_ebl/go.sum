@@ -394,6 +394,10 @@ github.com/wxl-server/idl_gen v0.0.0-20250213140414-e098f0b191ca h1:LlBEqYPWnOJG
 github.com/wxl-server/idl_gen v0.0.0-20250213140414-e098f0b191ca/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/wxl-server/idl_gen v0.0.0-20250219023155-46600c55c6ab h1:8SyfUW60iirwzNVeTwb/sPitXR//snuhAU7Rp4ODegI=
 github.com/wxl-server/idl_gen v0.0.0-20250219023155-46600c55c6ab/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
+github.com/wxl-server/idl_gen v0.0.0-20250219025004-d6c4b9b6ebec h1:XbEo1jtB9ebA6gnf+Nu82AyJbSVAJBrFtNAxFlWDuPA=
+github.com/wxl-server/idl_gen v0.0.0-20250219025004-d6c4b9b6ebec/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
+github.com/wxl-server/idl_gen v0.0.0-20250219025850-e4c326d0e0f9 h1:yTn1JMYKnkjhP0njQ0H8105ajCsWnP9t14ySmGI13pE=
+github.com/wxl-server/idl_gen v0.0.0-20250219025850-e4c326d0e0f9/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

@@ -32,4 +32,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("create company error"),
 	}
+	GetUserInfoError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("get user info error"),
+	}
 )

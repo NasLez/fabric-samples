@@ -16,8 +16,11 @@ type Handler struct {
 	p Param
 }
 
-func (s *Handler) Login(ctx context.Context, req *fabric_ebl.LoginReq) (r *fabric_ebl.LoginResp, err error) {
+func (s *Handler) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (r *fabric_ebl.GetUserInfoResp, err error) {
+	return s.p.FabricEblService.GetUserInfo(ctx, req)
+}
 
+func (s *Handler) Login(ctx context.Context, req *fabric_ebl.LoginReq) (r *fabric_ebl.LoginResp, err error) {
 	return s.p.FabricEblService.Login(ctx, req)
 }
 

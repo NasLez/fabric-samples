@@ -23,7 +23,7 @@ func Register(r *server.Hertz) {
 	}
 	{
 		_user := root.Group("/user", _userMw()...)
+		_user.GET("/info", append(_getuserinfoMw(), model.GetUserInfo)...)
 		_user.POST("/login", append(_loginMw(), model.Login)...)
-		_user.POST("/signup", append(_signupMw(), model.SignUp)...)
 	}
 }

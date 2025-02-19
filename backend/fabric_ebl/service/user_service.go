@@ -23,6 +23,7 @@ type FabricEblService interface {
 	UpdatePassword(ctx context.Context, req *common_user.UpdatePasswordReq) (*common_user.UpdatePasswordResp, error)
 	Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error)
 	CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error)
+	GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error)
 }
 
 type Param struct {
@@ -32,6 +33,10 @@ type Param struct {
 
 type FabricEblServiceImpl struct {
 	p Param
+}
+
+func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {
+	return nil, nil
 }
 
 func NewUserService(p Param) FabricEblService {

@@ -27,3 +27,12 @@ func Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.Logi
 	}
 	return resp, nil
 }
+
+func GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (resp *fabric_ebl.GetUserInfoResp, err error) {
+	resp, err = client.GetUserInfo(ctx, req)
+	if err != nil {
+		logger.CtxErrorf(ctx, "GetUserInfo error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}
