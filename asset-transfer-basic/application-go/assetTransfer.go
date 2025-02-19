@@ -77,12 +77,12 @@ func main() {
 	//}
 	//log.Println(string(result))
 
-	log.Println("--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments")
-	result, err = contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
-	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
-	}
-	log.Println(string(result))
+	//log.Println("--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments")
+	//result, err = contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
+	//if err != nil {
+	//	log.Fatalf("Failed to Submit transaction: %v", err)
+	//}
+	//log.Println(string(result))
 
 	log.Println("--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID")
 	result, err = contract.EvaluateTransaction("ReadAsset", "asset13")
