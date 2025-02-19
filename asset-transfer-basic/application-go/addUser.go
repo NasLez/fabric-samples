@@ -1,48 +1,47 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 )
 
-func main() {
-	log.Println("============ application-golang starts ============")
-
-	// Define a command line flag for username
-	username := flag.String("username", "", "The username to populate the wallet for")
-	flag.Parse()
-
-	// Ensure that the username is provided
-	if *username == "" {
-		log.Fatal("Username is required. Use the -username flag to provide it.")
-	}
-
-	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environment variable: %v", err)
-	}
-
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
-	}
-
-	// Check if the wallet contains the identity for the provided username
-	if !wallet.Exists(*username) {
-		err = addUserToWallet(wallet, *username)
-		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
-		}
-	}
-
-	log.Println("============ application-golang ends ============")
-}
+//
+//func main() {
+//	log.Println("============ application-golang starts ============")
+//
+//	// Define a command line flag for username
+//	username := flag.String("username", "", "The username to populate the wallet for")
+//	flag.Parse()
+//
+//	// Ensure that the username is provided
+//	if *username == "" {
+//		log.Fatal("Username is required. Use the -username flag to provide it.")
+//	}
+//
+//	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+//	if err != nil {
+//		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environment variable: %v", err)
+//	}
+//
+//	wallet, err := gateway.NewFileSystemWallet("wallet")
+//	if err != nil {
+//		log.Fatalf("Failed to create wallet: %v", err)
+//	}
+//
+//	// Check if the wallet contains the identity for the provided username
+//	if !wallet.Exists(*username) {
+//		err = addUserToWallet(wallet, *username)
+//		if err != nil {
+//			log.Fatalf("Failed to populate wallet contents: %v", err)
+//		}
+//	}
+//
+//	log.Println("============ application-golang ends ============")
+//}
 
 func addUserToWallet(wallet *gateway.Wallet, username string) error {
 	log.Println("============ Populating wallet for user:", username, "===========")
