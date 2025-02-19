@@ -4,10 +4,8 @@ import (
 	"context"
 	"ebl_api/biz/common/Status"
 	"ebl_api/biz/model"
-	"ebl_api/biz/sal/rpc/common_user_rpc"
 	"ebl_api/biz/sal/rpc/fabric_ebl_rpc"
-
-	"github.com/wxl-server/idl_gen/kitex_gen/common_user"
+	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -50,13 +48,13 @@ func (h *LoginHandler) handle() {
 	h.respData = h.respRpc2Http(resp)
 	h.ReturnResp(Status.Success, nil)
 }
-func (h *LoginHandler) respRpc2Http(resp *common_user.LoginResp) *model.LoginData {
+func (h *LoginHandler) respRpc2Http(resp *fabric_ebl.LoginResp) *model.LoginData {
 	return &model.LoginData{
 		Token: &resp.Token,
 	}
 }
-func (h *LoginHandler) reqHttp2Rpc(req *model.LoginReq) *common_user.LoginReq {
-	return &common_user.LoginReq{
+func (h *LoginHandler) reqHttp2Rpc(req *model.LoginReq) *fabric_ebl.LoginReq {
+	return &fabric_ebl.LoginReq{
 		Email:    *req.Email,
 		Password: *req.Password,
 	}
