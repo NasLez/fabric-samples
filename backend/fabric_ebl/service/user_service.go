@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strconv"
 
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/wxl-server/idl_gen/kitex_gen/common_user"
@@ -19,7 +20,6 @@ import (
 )
 
 type FabricEblService interface {
-	SignUp(ctx context.Context, req *common_user.SignUpReq) (resp *common_user.SignUpResp, err error)
 	UpdatePassword(ctx context.Context, req *common_user.UpdatePasswordReq) (*common_user.UpdatePasswordResp, error)
 	Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error)
 	CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error)
@@ -36,7 +36,33 @@ type FabricEblServiceImpl struct {
 }
 
 func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {
-	return nil, nil
+	token := req.Token
+	claims, err := jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, biz_error.ParseTokenError
+	}
+	user_id, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	user, err := u.p.FabricEblRepo.QueryUserById(ctx, user_id)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return nil, err
+	}
+	return &fabric_ebl.GetUserInfoResp{
+		UserId:      user.ID,
+		UserName:    user.Name,
+		UserEmail:   user.Email,
+		UserType:    fabric_ebl.UserType(user.Type),
+		CompanyId:   company.ID,
+		CompanyName: company.Name,
+		CompanyCode: company.Code,
+		CompanyType: fabric_ebl.CompanyType(company.Type),
+	}, nil
 }
 
 func NewUserService(p Param) FabricEblService {

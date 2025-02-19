@@ -20,6 +20,8 @@ type FabricEblRepo interface {
 	QueryCompanyByCode(ctx context.Context, code string) (do *domain.CompanyDO, err error)
 	CountCompanyByCode(ctx context.Context, code string) (count int64, err error)
 	CreateCompany(ctx context.Context, do *domain.CompanyDO) (id int64, err error)
+	QueryUserById(ctx context.Context, id int64) (do *domain.UserDO, err error)
+	QueryCompanyById(ctx context.Context, id int64) (do *domain.CompanyDO, err error)
 }
 
 type Param struct {
@@ -28,6 +30,26 @@ type Param struct {
 
 type FabricEblRepoImpl struct {
 	p Param
+}
+
+func (u FabricEblRepoImpl) QueryCompanyById(ctx context.Context, id int64) (do *domain.CompanyDO, err error) {
+	po := query.Q.CompanyPO
+	companyPO, err := po.WithContext(ctx).Where(po.ID.Eq(id)).First()
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err", err)
+		return nil, err
+	}
+	return converter.CompanyPO2DO(companyPO), nil
+}
+
+func (u FabricEblRepoImpl) QueryUserById(ctx context.Context, id int64) (do *domain.UserDO, err error) {
+	po := query.Q.UserPO
+	userPO, err := po.WithContext(ctx).Where(po.ID.Eq(id)).First()
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	return converter.UserPO2DO(userPO), nil
 }
 
 func (u FabricEblRepoImpl) CreateCompany(ctx context.Context, do *domain.CompanyDO) (id int64, err error) {

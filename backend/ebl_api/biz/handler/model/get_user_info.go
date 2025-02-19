@@ -41,19 +41,13 @@ func (h *GetUserInfoHandler) handle() {
 		h.hertzCtx.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	// get token from header
-	header := map[string]string{}
-	err1 := h.hertzCtx.BindHeader(header)
-	if err1 != nil {
-		h.ReturnResp(Status.GetUserInfoError, err)
-		return
-	}
-	resp, err := fabric_ebl_rpc.GetUserInfo(ctx, h.reqHttp2Rpc(&req))
+	header := h.hertzCtx.Request.Header
+	token := header.Get("token")
+	resp, err := fabric_ebl_rpc.GetUserInfo(ctx, h.reqHttp2Rpc(token))
 	if err != nil {
 		h.ReturnResp(Status.GetUserInfoError, err)
 		return
 	}
-	resp.UserName = header["token"]
 	h.respData = h.respRpc2Http(resp)
 	h.ReturnResp(Status.Success, nil)
 
@@ -70,8 +64,10 @@ func (h *GetUserInfoHandler) respRpc2Http(resp *fabric_ebl.GetUserInfoResp) *mod
 		CompanyType: gptr.Of(model.CompanyType(resp.CompanyType)),
 	}
 }
-func (h *GetUserInfoHandler) reqHttp2Rpc(req *model.GetUserInfoReq) *fabric_ebl.GetUserInfoReq {
-	return &fabric_ebl.GetUserInfoReq{}
+func (h *GetUserInfoHandler) reqHttp2Rpc(token string) *fabric_ebl.GetUserInfoReq {
+	return &fabric_ebl.GetUserInfoReq{
+		Token: token,
+	}
 }
 
 func (h *GetUserInfoHandler) ReturnResp(status *Status.Status, err error) {
