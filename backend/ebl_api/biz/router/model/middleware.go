@@ -40,3 +40,8 @@ func _getuserinfoMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getcompanyalllistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

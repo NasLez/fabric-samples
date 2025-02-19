@@ -24,6 +24,7 @@ type FabricEblService interface {
 	Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error)
 	CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error)
 	GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error)
+	GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error)
 }
 
 type Param struct {
@@ -33,6 +34,26 @@ type Param struct {
 
 type FabricEblServiceImpl struct {
 	p Param
+}
+
+func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error) {
+	companyList, err := u.p.FabricEblRepo.QueryCompanyAll(ctx)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyAll failed, err = %v", err)
+		return nil, err
+	}
+	var companyListResp []*fabric_ebl.Company
+	for _, company := range companyList {
+		companyListResp = append(companyListResp, &fabric_ebl.Company{
+			Id:          company.ID,
+			CompanyCode: company.Code,
+			CompanyName: company.Name,
+			CompanyType: fabric_ebl.CompanyType(company.Type),
+		})
+	}
+	return &fabric_ebl.GetCompanyAllListResp{
+		CompanyList: companyListResp,
+	}, nil
 }
 
 func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {

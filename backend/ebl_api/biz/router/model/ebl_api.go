@@ -19,6 +19,7 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_company := root.Group("/company", _companyMw()...)
+		_company.GET("/all", append(_getcompanyalllistMw(), model.GetCompanyAllList)...)
 		_company.POST("/create", append(_createcompanyMw(), model.CreateCompany)...)
 	}
 	{

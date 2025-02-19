@@ -36,3 +36,12 @@ func GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (resp *fab
 	}
 	return resp, nil
 }
+
+func GetCompanyAllList(ctx context.Context, rpc *fabric_ebl.GetCompanyAllListReq) (resp *fabric_ebl.GetCompanyAllListResp, err error) {
+	resp, err = client.GetCompanyAllList(ctx, rpc)
+	if err != nil {
+		logger.CtxErrorf(ctx, "GetCompanyAllList error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}

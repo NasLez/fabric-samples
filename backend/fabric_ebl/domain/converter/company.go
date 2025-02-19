@@ -53,3 +53,20 @@ func CompanyPO2DO(po *model.CompanyPO) *domain.CompanyDO {
 		UpdatedAt: po.UpdatedAt,
 	}
 }
+
+func CompanyPOs2DOs(pos []*model.CompanyPO) (dos []domain.QueryCompanyDo) {
+	dos = make([]domain.QueryCompanyDo, 0, len(pos))
+	for po := range pos {
+		dos = append(dos, CompanyPo2QueryCompanyDo(pos[po]))
+	}
+	return dos
+}
+
+func CompanyPo2QueryCompanyDo(po *model.CompanyPO) domain.QueryCompanyDo {
+	return domain.QueryCompanyDo{
+		ID:   po.ID,
+		Name: po.Name,
+		Code: po.Code,
+		Type: po.Type,
+	}
+}

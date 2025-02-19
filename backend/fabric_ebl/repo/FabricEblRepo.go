@@ -22,6 +22,7 @@ type FabricEblRepo interface {
 	CreateCompany(ctx context.Context, do *domain.CompanyDO) (id int64, err error)
 	QueryUserById(ctx context.Context, id int64) (do *domain.UserDO, err error)
 	QueryCompanyById(ctx context.Context, id int64) (do *domain.CompanyDO, err error)
+	QueryCompanyAll(ctx context.Context) (do []domain.QueryCompanyDo, err error)
 }
 
 type Param struct {
@@ -30,6 +31,17 @@ type Param struct {
 
 type FabricEblRepoImpl struct {
 	p Param
+}
+
+func (u FabricEblRepoImpl) QueryCompanyAll(ctx context.Context) (do []domain.QueryCompanyDo, err error) {
+	po := query.Q.CompanyPO
+	condition := po.WithContext(ctx)
+	companyPOS, err := condition.Find()
+	if err != nil {
+		logger.CtxErrorf(ctx, "condition.Find failed, err = %v", err)
+		return nil, err
+	}
+	return converter.CompanyPOs2DOs(companyPOS), nil
 }
 
 func (u FabricEblRepoImpl) QueryCompanyById(ctx context.Context, id int64) (do *domain.CompanyDO, err error) {

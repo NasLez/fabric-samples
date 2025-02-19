@@ -36,4 +36,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("get user info error"),
 	}
+	GetCompanyAllListError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("get company all list error"),
+	}
 )

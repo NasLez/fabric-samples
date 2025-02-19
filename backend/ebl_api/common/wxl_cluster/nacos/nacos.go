@@ -19,7 +19,7 @@ func NewNacosClient() (naming_client.INamingClient, error) {
 					Password:    "wxl5211314",
 				},
 				ServerConfigs: []constant.ServerConfig{
-					*constant.NewServerConfig("wxl475.cn", 30898),
+					*constant.NewServerConfig("127.0.0.1", 8848),
 				},
 			},
 		)
