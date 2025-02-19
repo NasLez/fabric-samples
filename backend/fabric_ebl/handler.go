@@ -1,0 +1,32 @@
+package main
+
+import (
+	"context"
+	"fabric_ebl/service"
+	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
+	"go.uber.org/dig"
+)
+
+var handler fabric_ebl.FabricEbl
+
+// FabricEblImpl implements the last service interface defined in the IDL.
+
+// Handler implements the last service interface defined in the IDL.
+type Handler struct {
+	p Param
+}
+
+type Param struct {
+	dig.In
+	FabricEblService service.FabricEblService
+}
+
+func NewHandler(p Param) {
+	handler = &Handler{
+		p: p,
+	}
+}
+
+func (s *Handler) CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (r *fabric_ebl.CreateCompanyResp, err error) {
+	return s.p.FabricEblService.CreateCompany(ctx, req)
+}

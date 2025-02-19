@@ -1,0 +1,2 @@
+Mysql:
+  Dsn: "root:wxl5211314@tcp(wxl475.cn:32130)/common_user?charset=utf8mb4&parseTime=True&loc=Local"
