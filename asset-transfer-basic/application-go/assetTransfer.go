@@ -63,12 +63,12 @@ func main() {
 
 	contract := network.GetContract("basic")
 
-	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger")
-	result, err := contract.SubmitTransaction("InitLedger")
-	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
-	}
-	log.Println(string(result))
+	//log.Println("--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger")
+	//result, err := contract.SubmitTransaction("InitLedger")
+	//if err != nil {
+	//	log.Fatalf("Failed to Submit transaction: %v", err)
+	//}
+	//log.Println(string(result))
 
 	//log.Println("--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger")
 	//result, err = contract.EvaluateTransaction("GetAllAssets")
