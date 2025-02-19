@@ -21,7 +21,7 @@ import (
 type FabricEblService interface {
 	SignUp(ctx context.Context, req *common_user.SignUpReq) (resp *common_user.SignUpResp, err error)
 	UpdatePassword(ctx context.Context, req *common_user.UpdatePasswordReq) (*common_user.UpdatePasswordResp, error)
-	Login(ctx context.Context, req *common_user.LoginReq) (resp *common_user.LoginResp, err error)
+	Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error)
 	CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error)
 }
 
@@ -82,7 +82,7 @@ func (u FabricEblServiceImpl) UpdatePassword(ctx context.Context, req *common_us
 	return &common_user.UpdatePasswordResp{}, nil
 }
 
-func (u FabricEblServiceImpl) Login(ctx context.Context, req *common_user.LoginReq) (resp *common_user.LoginResp, err error) {
+func (u FabricEblServiceImpl) Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error) {
 	do, err := u.p.FabricEblRepo.QueryUser(ctx, req.Email)
 	if err != nil {
 		logger.CtxErrorf(ctx, "QueryUser failed, err = %v", err)
@@ -97,7 +97,7 @@ func (u FabricEblServiceImpl) Login(ctx context.Context, req *common_user.LoginR
 		logger.CtxErrorf(ctx, "login failed, err = %v", err)
 		return nil, biz_error.LoginError
 	}
-	return &common_user.LoginResp{
+	return &fabric_ebl.LoginResp{
 		Token: token,
 	}, nil
 }

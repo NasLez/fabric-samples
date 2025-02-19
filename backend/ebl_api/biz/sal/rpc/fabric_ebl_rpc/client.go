@@ -18,3 +18,12 @@ func CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp 
 	}
 	return resp, nil
 }
+
+func Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error) {
+	resp, err = client.Login(ctx, req)
+	if err != nil {
+		logger.CtxErrorf(ctx, "login error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}

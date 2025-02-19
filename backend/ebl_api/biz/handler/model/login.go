@@ -5,6 +5,7 @@ import (
 	"ebl_api/biz/common/Status"
 	"ebl_api/biz/model"
 	"ebl_api/biz/sal/rpc/common_user_rpc"
+	"ebl_api/biz/sal/rpc/fabric_ebl_rpc"
 
 	"github.com/wxl-server/idl_gen/kitex_gen/common_user"
 
@@ -41,7 +42,7 @@ func (h *LoginHandler) handle() {
 		h.hertzCtx.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	resp, err := common_user_rpc.Login(ctx, h.reqHttp2Rpc(&req))
+	resp, err := fabric_ebl_rpc.Login(ctx, h.reqHttp2Rpc(&req))
 	if err != nil {
 		h.ReturnResp(Status.LoginError, err)
 		return

@@ -16,6 +16,11 @@ type Handler struct {
 	p Param
 }
 
+func (s *Handler) Login(ctx context.Context, req *fabric_ebl.LoginReq) (r *fabric_ebl.LoginResp, err error) {
+
+	return s.p.FabricEblService.Login(ctx, req)
+}
+
 type Param struct {
 	dig.In
 	FabricEblService service.FabricEblService
