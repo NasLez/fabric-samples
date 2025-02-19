@@ -162,7 +162,6 @@ func addUserToWallet(wallet *gateway.Wallet, username string) error {
 	credPath := filepath.Join(
 		"..",
 		"..",
-		"..",
 		"test-network",
 		"organizations",
 		"peerOrganizations",
