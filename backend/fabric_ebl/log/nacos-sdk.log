@@ -2107,6 +2107,28 @@
 2025-02-19T12:30:32.540+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
 2025-02-19T12:30:36.537+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
 2025-02-19T12:30:37.543+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:30:41.542+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:30:42.546+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:30:46.546+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:30:47.550+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:30:51.551+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:30:52.553+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:30:56.555+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:30:57.557+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:01.559+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:02.561+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:06.563+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:07.563+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:11.569+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:12.567+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:16.573+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:17.571+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:21.578+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:22.574+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:26.582+0800	[31mERROR[0m	security/security_proxy.go:84	login has error caused: User nacos not found;
+2025-02-19T12:31:27.578+0800	[34mINFO[0m	naming_client/naming_proxy.go:103	namespaceId:<public> sending beat to server:<{"ip":"192.168.1.108","port":8090,"weight":10,"serviceName":"DEFAULT_GROUP@@fabric_ebl","cluster":"DEFAULT","metadata":{"cloudwego.nacos.client":"kitex"},"scheduled":false}>
+2025-02-19T12:31:29.524+0800	[34mINFO[0m	naming_client/beat_reactor.go:83	remove beat: DEFAULT_GROUP@@fabric_ebl@192.168.1.108:8090 from beat map
+2025-02-19T12:31:29.525+0800	[34mINFO[0m	naming_client/naming_proxy.go:73	deregister instance namespaceId:<public>,serviceName:<DEFAULT_GROUP@@fabric_ebl> with instance:<192.168.1.108:8090@DEFAULT>
 2025-02-19T15:55:26.614+0800	[34mINFO[0m	clients/client_factory.go:60	logDir:</home/nas/bishe/fabric-samples/backend/fabric_ebl/log>   cacheDir:</home/nas/bishe/fabric-samples/backend/fabric_ebl/cache>
 2025-02-19T15:55:26.766+0800	[31mERROR[0m	nacos_server/nacos_server.go:75	login has error caused: User nacos not found;
 2025-02-19T15:55:26.766+0800	[34mINFO[0m	naming_client/push_receiver.go:81	udp server start, port: 55926
