@@ -64,9 +64,9 @@ func main() {
 	contract := network.GetContract("basic")
 
 	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger")
-	result, err := contract.EvaluateTransaction("ReadAsset", "asset13")
+	result, err := contract.SubmitTransaction("InitLedger")
 	if err != nil {
-		log.Fatalf("Failed to evaluate transaction: %v\n", err)
+		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 
@@ -77,12 +77,12 @@ func main() {
 	//}
 	//log.Println(string(result))
 
-	//log.Println("--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments")
-	//result, err = contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
-	//if err != nil {
-	//	log.Fatalf("Failed to Submit transaction: %v", err)
-	//}
-	//log.Println(string(result))
+	log.Println("--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments")
+	result, err = contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
 
 	log.Println("--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID")
 	result, err = contract.EvaluateTransaction("ReadAsset", "asset13")
@@ -109,7 +109,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to evaluate transaction: %v", err)
 	}
-	//log.Println(string(result))
+	log.Println(string(result))
+
+	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
+	result, err = contract.SubmitTransaction("CreateEbl", "ebl123", "company1", "Company A", "company2", "Company B", "company3", "Company C", "NYC", "Vessel X", "Port A", "Port B", "Place A", "Place B", "Mark A", "100.5", "Package A", "Kg", "Description", "200.0", "300.0", "Freight", "Place X", "1735708800", "Agent A", "1735708800", "1", "1735708800", "Active", "filehash123", "contractfile1", "invoice1", "company4", "Company D")
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+
+	// 查询交易：读取 EBL
+	log.Println("--> Evaluate Transaction: ReadEbl, function returns EBL with given originCompanyID")
+	result, err = contract.EvaluateTransaction("ReadEbl", "ebl123")
+	if err != nil {
+		log.Fatalf("Failed to evaluate transaction: %v\n", err)
+	}
+	log.Println(string(result))
 	log.Println("============ application-golang ends ============")
 }
 

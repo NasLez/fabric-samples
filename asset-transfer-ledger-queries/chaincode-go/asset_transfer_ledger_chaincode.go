@@ -81,6 +81,7 @@ import (
 )
 
 const index = "color~name"
+const EblIndex = "originCompanyID~eblNo"
 
 // SimpleChaincode implements the fabric-contract-api-go programming model
 type SimpleChaincode struct {
@@ -96,10 +97,50 @@ type Asset struct {
 	AppraisedValue int    `json:"appraisedValue"`
 }
 
+type Ebl struct {
+	EblNo                  string  `json:"eblNo"`
+	OriginCompanyID        string  `json:"originCompanyID"`
+	OriginCompanyName      string  `json:"originCompanyName"`
+	ShipperCompanyID       string  `json:"shipperCompanyID"`
+	ShipperCompanyName     string  `json:"shipperCompanyName"`
+	ConsigneeCompanyID     string  `json:"consigneeCompanyID"`
+	ConsigneeCompanyName   string  `json:"consigneeCompanyName"`
+	NotifyPartyCompanyID   string  `json:"notifyPartyCompanyID"`
+	NotifyPartyCompanyName string  `json:"notifyPartyCompanyName"`
+	PlaceOfReceipt         string  `json:"placeOfReceipt"`
+	OceanVessel            string  `json:"oceanVessel"`
+	PortOfLoading          string  `json:"portOfLoading"`
+	PortOfDescharge        string  `json:"portOfDescharge"`
+	PlaceOfDestination     string  `json:"placeOfDestination"`
+	PlaceOfDelivery        string  `json:"placeOfDelivery"`
+	ShippingMarkes         string  `json:"shippingMarkes"`
+	QuantityOfPackages     float64 `json:"quantityOfPackages"`
+	KindOfPackagesGW       string  `json:"kindOfPackagesGw"`
+	KindOfPackagesM        string  `json:"kindOfPackagesM"`
+	DescriptionOfGoods     string  `json:"descriptionOfGoods"`
+	GrossWeight            float64 `json:"grossWeight"`
+	Measurement            float64 `json:"measurement"`
+	FreightAndCharges      string  `json:"freightAndCharges"`
+	PlaceOfIssue           string  `json:"placeOfIssue"`
+	DateOfIssue            int64   `json:"dateOfIssue"`
+	DeliveryAgent          string  `json:"deliveryAgent"`
+	ShippedOnBoard         int64   `json:"shippedOnBoard"`
+	NumOfEBL               int     `json:"numOfEbl"`
+	DateOfIssueDeadline    int64   `json:"dateOfIssueDeadline"`
+	Status                 string  `json:"status"`
+	File                   string  `json:"fileHash"`
+	ContractFiles          string  `json:"contractFiles"`
+	InvoiceFiles           string  `json:"invoiceFiles"`
+	TransferCompanyID      string  `json:"transferCompanyID"`
+	TransferCompanyName    string  `json:"transferCompanyName"`
+	CompanyID              int64   `json:"companyID"`
+	CompanyName            string  `json:"companyName"`
+}
+
 // HistoryQueryResult structure used for returning result of history query
 type HistoryQueryResult struct {
 	Record    *Asset    `json:"record"`
-	TxId     string    `json:"txId"`
+	TxId      string    `json:"txId"`
 	Timestamp time.Time `json:"timestamp"`
 	IsDelete  bool      `json:"isDelete"`
 }
@@ -154,6 +195,89 @@ func (t *SimpleChaincode) CreateAsset(ctx contractapi.TransactionContextInterfac
 	return ctx.GetStub().PutState(colorNameIndexKey, value)
 }
 
+// CreateEbl initializes a new EBL (Electronic Bill of Lading) in the ledger
+func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface, eblNo, originCompanyID, originCompanyName, shipperCompanyID, shipperCompanyName, consigneeCompanyID, consigneeCompanyName, notifyPartyCompanyID, notifyPartyCompanyName, placeOfReceipt, oceanVessel, portOfLoading, portOfDescharge, placeOfDestination, placeOfDelivery, shippingMarkes string, quantityOfPackages float64, kindOfPackagesGW, kindOfPackagesM, descriptionOfGoods string, grossWeight, measurement float64, freightAndCharges, placeOfIssue string, dateOfIssue int64, deliveryAgent string, shippedOnBoard int64, numOfEBL int, dateOfIssueDeadline int64, status, file string, contractFiles, invoiceFiles string, transferCompanyID, transferCompanyName string, companyName string, companyID int64) error {
+	// Check if the EBL already exists
+	exists, err := t.EblExists(ctx, eblNo)
+	if err != nil {
+		return fmt.Errorf("failed to check if EBL exists: %v", err)
+	}
+	if exists {
+		return fmt.Errorf("EBL already exists: %s", eblNo)
+	}
+
+	// Create the EBL object
+	ebl := &Ebl{
+		EblNo:                  eblNo,
+		OriginCompanyID:        originCompanyID,
+		OriginCompanyName:      originCompanyName,
+		ShipperCompanyID:       shipperCompanyID,
+		ShipperCompanyName:     shipperCompanyName,
+		ConsigneeCompanyID:     consigneeCompanyID,
+		ConsigneeCompanyName:   consigneeCompanyName,
+		NotifyPartyCompanyID:   notifyPartyCompanyID,
+		NotifyPartyCompanyName: notifyPartyCompanyName,
+		PlaceOfReceipt:         placeOfReceipt,
+		OceanVessel:            oceanVessel,
+		PortOfLoading:          portOfLoading,
+		PortOfDescharge:        portOfDescharge,
+		PlaceOfDestination:     placeOfDestination,
+		PlaceOfDelivery:        placeOfDelivery,
+		ShippingMarkes:         shippingMarkes,
+		QuantityOfPackages:     quantityOfPackages,
+		KindOfPackagesGW:       kindOfPackagesGW,
+		KindOfPackagesM:        kindOfPackagesM,
+		DescriptionOfGoods:     descriptionOfGoods,
+		GrossWeight:            grossWeight,
+		Measurement:            measurement,
+		FreightAndCharges:      freightAndCharges,
+		PlaceOfIssue:           placeOfIssue,
+		DateOfIssue:            dateOfIssue,
+		DeliveryAgent:          deliveryAgent,
+		ShippedOnBoard:         shippedOnBoard,
+		NumOfEBL:               numOfEBL,
+		DateOfIssueDeadline:    dateOfIssueDeadline,
+		Status:                 status,
+		File:                   file,
+		ContractFiles:          contractFiles,
+		InvoiceFiles:           invoiceFiles,
+		TransferCompanyID:      transferCompanyID,
+		TransferCompanyName:    transferCompanyName,
+		CompanyName:            companyName,
+		CompanyID:              companyID,
+	}
+
+	// Marshal the EBL struct into JSON bytes
+	eblBytes, err := json.Marshal(ebl)
+	if err != nil {
+		return err
+	}
+
+	// Save the EBL to the world state
+	err = ctx.GetStub().PutState(eblNo, eblBytes)
+	if err != nil {
+		return err
+	}
+
+	// Create an index for EBL by EblNo to support efficient querying based on EBL number
+	// Here we create an index for querying by EblNo
+	eblNoIndexKey, err := ctx.GetStub().CreateCompositeKey(EblIndex, []string{ebl.EblNo, ebl.OriginCompanyID})
+	if err != nil {
+		return err
+	}
+
+	// Save the index entry to the world state
+	value := []byte{0x00} // we don't need to store a duplicate copy of the EBL, just the index key
+	err = ctx.GetStub().PutState(eblNoIndexKey, value)
+	if err != nil {
+		return err
+	}
+
+	// Optionally, create other indexes based on different fields (e.g. status, companyID, etc.)
+
+	return nil
+}
+
 // ReadAsset retrieves an asset from the ledger
 func (t *SimpleChaincode) ReadAsset(ctx contractapi.TransactionContextInterface, assetID string) (*Asset, error) {
 	assetBytes, err := ctx.GetStub().GetState(assetID)
@@ -171,6 +295,27 @@ func (t *SimpleChaincode) ReadAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	return &asset, nil
+}
+
+// ReadEbl retrieves an EBL from the ledger based on originCompanyID.
+func (t *SimpleChaincode) ReadEbl(ctx contractapi.TransactionContextInterface, eblNo string) (*Ebl, error) {
+	// Get the EBL from the world state
+	eblBytes, err := ctx.GetStub().GetState(eblNo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read EBL %s from world state: %v", eblNo, err)
+	}
+	if eblBytes == nil {
+		return nil, fmt.Errorf("EBL %s does not exist", eblNo)
+	}
+
+	// Unmarshal the EBL bytes into an EBL struct
+	var ebl Ebl
+	err = json.Unmarshal(eblBytes, &ebl)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ebl, nil
 }
 
 // DeleteAsset removes an asset key-value pair from the ledger
@@ -431,6 +576,16 @@ func (t *SimpleChaincode) AssetExists(ctx contractapi.TransactionContextInterfac
 	}
 
 	return assetBytes != nil, nil
+}
+
+// EblExists returns true when EBL with given EblNo exists in the ledger.
+func (t *SimpleChaincode) EblExists(ctx contractapi.TransactionContextInterface, eblNo string) (bool, error) {
+	eblBytes, err := ctx.GetStub().GetState(eblNo)
+	if err != nil {
+		return false, fmt.Errorf("failed to read EBL %s from world state. %v", eblNo, err)
+	}
+
+	return eblBytes != nil, nil
 }
 
 // InitLedger creates the initial set of assets in the ledger.
