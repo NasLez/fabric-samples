@@ -64,11 +64,12 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 		return nil, err
 	}
-	if company.ID != req.Ebl.CompanyID {
+	originCompanyID, err := strconv.ParseInt(req.Ebl.OriginCompanyID, 10, 64)
+	if company.ID != originCompanyID {
 		logger.CtxErrorf(ctx, "CreateEbl failed, company id is wrong")
 		return nil, err
 	}
-	if company.Name != req.Ebl.CompanyName {
+	if company.Name != req.Ebl.OriginCompanyName {
 		logger.CtxErrorf(ctx, "CreateEbl failed, company name is wrong")
 		return nil, err
 	}
