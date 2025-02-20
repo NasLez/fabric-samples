@@ -115,37 +115,92 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10) + "-" + strconv.FormatInt(req.Ebl.CompanyID, 10)
+
+	{
+		result, err := contract.SubmitTransaction(
+			"CreateEbl",               // chaincode method
+			"ebl123",                  // eblNo
+			"company1",                // originCompanyID
+			"Company A",               // originCompanyName
+			"company2",                // shipperCompanyID
+			"Company B",               // shipperCompanyName
+			"company3",                // consigneeCompanyID
+			"Company C",               // consigneeCompanyName
+			"company4",                // notifyPartyCompanyID
+			"Company D",               // notifyPartyCompanyName
+			"NYC",                     // placeOfReceipt
+			"Vessel X",                // oceanVessel
+			"Port A",                  // portOfLoading
+			"Port B",                  // portOfDescharge
+			"Place A",                 // placeOfDestination
+			"Place B",                 // placeOfDelivery
+			"Mark A",                  // shippingMarkes
+			"contractfile1",           // contractFiles (Array of files)
+			"invoicefile1",            // invoiceFiles (Array of files)
+			"company5",                // transferCompanyID
+			"Company E",               // transferCompanyName
+			"Package A",               // kindOfPackagesGW
+			"Kg",                      // kindOfPackagesM
+			"Sample Description",      // descriptionOfGoods
+			"Agent A",                 // deliveryAgent
+			"Company X",               // companyName
+			"Freight charges details", // freightAndCharges
+			"Active",                  // status
+			"filehash123",             // file
+			"Place X",                 // placeOfIssue
+			"100.5",                   // quantityOfPackages
+			"200.0",                   // grossWeight
+			"300.0",                   // measurement
+			"1635734400",              // dateOfIssue (int64 timestamp)
+			"1635734400",              // shippedOnBoard (int64 timestamp)
+			"1",                       // numOfEBL
+			"1635734400",              // dateOfIssueDeadline (int64 timestamp)
+			"1234567",                 // companyID (int64)
+		)
+		if err != nil {
+			log.Fatalf("Failed to Submit transaction: %v", err)
+		}
+		log.Println(string(result))
+
+		// 查询交易：读取 EBL
+		log.Println("--> Evaluate Transaction: ReadEbl, function returns EBL with given originCompanyID")
+		result, err = contract.EvaluateTransaction("ReadEbl", "ebl123")
+		if err != nil {
+			log.Fatalf("Failed to evaluate transaction: %v\n", err)
+		}
+		log.Println(string(result))
+	}
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		req.Ebl.TransferCompanyID,                // transferCompanyID
-		req.Ebl.TransferCompanyName,              // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		req.Ebl.TransferCompanyID,                                    // transferCompanyID
+		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
