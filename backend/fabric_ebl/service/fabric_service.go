@@ -13,6 +13,7 @@ import (
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -73,14 +74,14 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		logger.CtxErrorf(ctx, "CreateEbl failed, company name is wrong")
 		return nil, err
 	}
-
+	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	if err != nil {
+		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	}
 	//{
 	//	log.Println("============ application-golang starts ============")
 	//
-	//	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	//	if err != nil {
-	//		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	//	}
+	//
 	//
 	//	wallet, err := gateway.NewFileSystemWallet("wallet")
 	//	if err != nil {
