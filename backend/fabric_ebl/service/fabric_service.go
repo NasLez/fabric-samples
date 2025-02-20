@@ -89,7 +89,6 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	ccpPath := filepath.Join(
 		"..",
 		"..",
-		"..",
 		"test-network",
 		"organizations",
 		"peerOrganizations",
