@@ -40,4 +40,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("get company all list error"),
 	}
+	CreateEblError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("create ebl error"),
+	}
 )

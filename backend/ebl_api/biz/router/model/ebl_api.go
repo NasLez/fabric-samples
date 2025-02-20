@@ -23,6 +23,10 @@ func Register(r *server.Hertz) {
 		_company.POST("/create", append(_createcompanyMw(), model.CreateCompany)...)
 	}
 	{
+		_ebl := root.Group("/ebl", _eblMw()...)
+		_ebl.POST("/create", append(_createeblMw(), model.CreateEbl)...)
+	}
+	{
 		_user := root.Group("/user", _userMw()...)
 		_user.GET("/info", append(_getuserinfoMw(), model.GetUserInfo)...)
 		_user.POST("/login", append(_loginMw(), model.Login)...)

@@ -45,3 +45,13 @@ func _getcompanyalllistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _eblMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createeblMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

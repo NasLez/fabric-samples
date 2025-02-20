@@ -45,3 +45,12 @@ func GetCompanyAllList(ctx context.Context, rpc *fabric_ebl.GetCompanyAllListReq
 	}
 	return resp, nil
 }
+
+func CreateEbl(ctx context.Context, rpc *fabric_ebl.CreateEblReq) (resp *fabric_ebl.CreateEblResp, err error) {
+	resp, err = client.CreateEbl(ctx, rpc)
+	if err != nil {
+		logger.CtxErrorf(ctx, "CreateEbl error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}

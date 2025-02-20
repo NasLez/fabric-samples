@@ -3,16 +3,19 @@ package service
 import (
 	"context"
 	"fabric_ebl/biz_error"
+	"fabric_ebl/common/id_gen"
 	"fabric_ebl/domain/converter"
 	"fabric_ebl/repo"
 	"fabric_ebl/sal/jwt"
 	"fmt"
+	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/wxl-server/idl_gen/kitex_gen/common_user"
@@ -25,6 +28,7 @@ type FabricEblService interface {
 	CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error)
 	GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error)
 	GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error)
+	CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error)
 }
 
 type Param struct {
@@ -34,6 +38,129 @@ type Param struct {
 
 type FabricEblServiceImpl struct {
 	p Param
+}
+
+func NewUserService(p Param) FabricEblService {
+	return &FabricEblServiceImpl{
+		p: p,
+	}
+}
+
+func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error) {
+	token := req.Token
+	claims, err := jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, biz_error.ParseTokenError
+	}
+	user_id, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	user, err := u.p.FabricEblRepo.QueryUserById(ctx, user_id)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return nil, err
+	}
+	if company.ID != req.Ebl.CompanyID {
+		logger.CtxErrorf(ctx, "CreateEbl failed, company id is wrong")
+		return nil, err
+	}
+	if company.Name != req.Ebl.CompanyName {
+		logger.CtxErrorf(ctx, "CreateEbl failed, company name is wrong")
+		return nil, err
+	}
+	walletName := company.Name + "_" + user.Name
+	wallet, err := gateway.NewFileSystemWallet("wallet")
+	if err != nil {
+		log.Fatalf("Failed to create wallet: %v", err)
+	}
+
+	if !wallet.Exists(walletName) {
+		err = addUserToWallet(wallet, walletName)
+		if err != nil {
+			log.Fatalf("Failed to populate wallet contents: %v", err)
+		}
+	}
+
+	ccpPath := filepath.Join(
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"connection-org1.yaml",
+	)
+
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, "appUser"),
+	)
+	if err != nil {
+		log.Fatalf("Failed to connect to gateway: %v", err)
+	}
+	defer gw.Close()
+
+	network, err := gw.GetNetwork("mychannel")
+	if err != nil {
+		log.Fatalf("Failed to get network: %v", err)
+	}
+
+	contract := network.GetContract("basic")
+
+	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
+	ID, err := id_gen.NextID()
+	req.Ebl.EblNo = strconv.FormatInt(ID, 10) + "-" + strconv.FormatInt(req.Ebl.CompanyID, 10)
+	result, err := contract.SubmitTransaction(
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		req.Ebl.TransferCompanyID,                                    // transferCompanyID
+		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
+		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
+		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
+		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
+		strconv.FormatInt(req.Ebl.DateOfIssue, 10),                   // dateOfIssue
+		strconv.FormatInt(req.Ebl.ShippedOnBoard, 10),                // shippedOnBoard
+		strconv.FormatInt(req.Ebl.NumOfEBL, 10),                      // numOfEBL
+		strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10),           // dateOfIssueDeadline
+		strconv.FormatInt(req.Ebl.CompanyID, 10),                     // companyID
+	)
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+	return &fabric_ebl.CreateEblResp{
+		Id: ID,
+	}, nil
 }
 
 func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error) {
@@ -84,12 +211,6 @@ func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.G
 		CompanyCode: company.Code,
 		CompanyType: fabric_ebl.CompanyType(company.Type),
 	}, nil
-}
-
-func NewUserService(p Param) FabricEblService {
-	return &FabricEblServiceImpl{
-		p: p,
-	}
 }
 
 func (u FabricEblServiceImpl) SignUp(ctx context.Context, req *common_user.SignUpReq) (resp *common_user.SignUpResp, err error) {
