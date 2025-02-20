@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("Failed to create wallet: %v", err)
 	}
 
-	if !wallet.Exists("appUser") {
+	if !wallet.Exists("nas1") {
 		err = populateWallet(wallet)
 		if err != nil {
 			log.Fatalf("Failed to populate wallet contents: %v", err)
@@ -49,7 +49,7 @@ func main() {
 
 	gw, err := gateway.Connect(
 		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, "appUser"),
+		gateway.WithIdentity(wallet, "nas1"),
 	)
 	if err != nil {
 		log.Fatalf("Failed to connect to gateway: %v", err)
@@ -63,12 +63,12 @@ func main() {
 
 	contract := network.GetContract("basic")
 
-	log.Println("--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger")
-	result, err := contract.SubmitTransaction("InitLedger")
-	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
-	}
-	log.Println(string(result))
+	//log.Println("--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger")
+	//result, err := contract.SubmitTransaction("InitLedger")
+	//if err != nil {
+	//	log.Fatalf("Failed to Submit transaction: %v", err)
+	//}
+	//log.Println(string(result))
 
 	//log.Println("--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger")
 	//result, err = contract.EvaluateTransaction("GetAllAssets")
@@ -78,7 +78,7 @@ func main() {
 	//log.Println(string(result))
 
 	log.Println("--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments")
-	result, err = contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
+	result, err := contract.SubmitTransaction("CreateAsset", "asset13", "yellow", "5", "Tom", "1300")
 	if err != nil {
 		log.Fatalf("Failed to Submit transaction: %v", err)
 	}
@@ -205,5 +205,5 @@ func populateWallet(wallet *gateway.Wallet) error {
 
 	identity := gateway.NewX509Identity("Org1MSP", string(cert), string(key))
 
-	return wallet.Put("appUser", identity)
+	return wallet.Put("nas1", identity)
 }
