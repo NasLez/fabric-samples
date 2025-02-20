@@ -73,19 +73,18 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		logger.CtxErrorf(ctx, "CreateEbl failed, company name is wrong")
 		return nil, err
 	}
+
 	walletName := company.Name + "_" + user.Name
 	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
 		log.Fatalf("Failed to create wallet: %v", err)
 	}
-
 	if !wallet.Exists(walletName) {
 		err = addUserToWallet(wallet, walletName)
 		if err != nil {
 			log.Fatalf("Failed to populate wallet contents: %v", err)
 		}
 	}
-
 	ccpPath := filepath.Join(
 		"..",
 		"..",
@@ -95,7 +94,6 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		"org1.example.com",
 		"connection-org1.yaml",
 	)
-
 	gw, err := gateway.Connect(
 		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
 		gateway.WithIdentity(wallet, walletName),
@@ -104,14 +102,11 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		log.Fatalf("Failed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
-
 	network, err := gw.GetNetwork("mychannel")
 	if err != nil {
 		log.Fatalf("Failed to get network: %v", err)
 	}
-
 	contract := network.GetContract("basic")
-
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10) + "-" + strconv.FormatInt(req.Ebl.CompanyID, 10)
