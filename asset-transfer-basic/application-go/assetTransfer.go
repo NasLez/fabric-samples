@@ -84,19 +84,19 @@ func main() {
 	//}
 	//log.Println(string(result))
 
-	log.Println("--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID")
-	result, err := contract.EvaluateTransaction("ReadAsset", "asset13")
-	if err != nil {
-		log.Fatalf("Failed to evaluate transaction: %v\n", err)
-	}
-	log.Println(string(result))
-
-	log.Println("--> Evaluate Transaction: AssetExists, function returns 'true' if an asset with given assetID exist")
-	result, err = contract.EvaluateTransaction("AssetExists", "asset1")
-	if err != nil {
-		log.Fatalf("Failed to evaluate transaction: %v\n", err)
-	}
-	log.Println(string(result))
+	//log.Println("--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID")
+	//result, err := contract.EvaluateTransaction("ReadAsset", "asset13")
+	//if err != nil {
+	//	log.Fatalf("Failed to evaluate transaction: %v\n", err)
+	//}
+	//log.Println(string(result))
+	//
+	//log.Println("--> Evaluate Transaction: AssetExists, function returns 'true' if an asset with given assetID exist")
+	//result, err = contract.EvaluateTransaction("AssetExists", "asset1")
+	//if err != nil {
+	//	log.Fatalf("Failed to evaluate transaction: %v\n", err)
+	//}
+	//log.Println(string(result))
 
 	//log.Println("--> Submit Transaction: TransferAsset asset1, transfer to new owner of Tom")
 	//_, err = contract.SubmitTransaction("TransferAsset", "asset1", "Tom")
@@ -112,7 +112,7 @@ func main() {
 	//log.Println(string(result))
 
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
-	result, err = contract.SubmitTransaction(
+	result, err := contract.SubmitTransaction(
 		"CreateEbl",               // chaincode method
 		"ebl1234",                 // eblNo
 		"company1",                // originCompanyID
