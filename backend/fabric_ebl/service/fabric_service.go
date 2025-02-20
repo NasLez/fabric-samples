@@ -124,7 +124,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 		result, err := contract.SubmitTransaction(
 			"CreateEbl",               // chaincode method
-			"ebl12345",                // eblNo
+			"ebl12346",                // eblNo
 			"company1",                // originCompanyID
 			"Company A",               // originCompanyName
 			"company2",                // shipperCompanyID
@@ -216,7 +216,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	{
 		result, err := contract.SubmitTransaction(
 			"CreateEbl",               // chaincode method
-			"ebl123",                  // eblNo
+			"ebl12347",                // eblNo
 			"company1",                // originCompanyID
 			"Company A",               // originCompanyName
 			"company2",                // shipperCompanyID
