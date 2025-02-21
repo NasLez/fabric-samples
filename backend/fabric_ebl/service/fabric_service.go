@@ -113,132 +113,154 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 			selector += ","
 		}
 		selector += "\"originCompanyID\":\"" + req.EblFilter.OriginCompanyID + "\""
+		types++
 	}
 	if req.EblFilter.ShipperCompanyID != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"shipperCompanyID\":\"" + req.EblFilter.ShipperCompanyID + "\""
+		types++
 	}
 	if req.EblFilter.ConsigneeCompanyID != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"consigneeCompanyID\":\"" + req.EblFilter.ConsigneeCompanyID + "\""
+		types++
 	}
 	if req.EblFilter.NotifyPartyCompanyID != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"notifyPartyCompanyID\":\"" + req.EblFilter.NotifyPartyCompanyID + "\""
+		types++
 	}
 	if req.EblFilter.PortOfDescharge != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"portOfDescharge\":\"" + req.EblFilter.PortOfDescharge + "\""
+		types++
 	}
 	if req.EblFilter.Status != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"status\":\"" + req.EblFilter.Status + "\""
+		types++
 	}
 	if req.EblFilter.CompanyID != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"companyID\":" + strconv.FormatInt(req.EblFilter.CompanyID, 10)
+		types++
 	}
 	if req.EblFilter.TransferCompanyID != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"transferCompanyID\":\"" + req.EblFilter.TransferCompanyID + "\""
+		types++
 	}
 	if req.EblFilter.DateOfIssue != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"dateOfIssue\":" + strconv.FormatInt(req.EblFilter.DateOfIssue, 10)
+		types++
 	}
 	if req.EblFilter.ShippedOnBoard != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"shippedOnBoard\":" + strconv.FormatInt(req.EblFilter.ShippedOnBoard, 10)
+		types++
 	}
 	if req.EblFilter.DateOfIssueDeadline != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"dateOfIssueDeadline\":" + strconv.FormatInt(req.EblFilter.DateOfIssueDeadline, 10)
+		types++
 	}
 	if req.EblFilter.QuantityOfPackages != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"quantityOfPackages\":" + strconv.FormatFloat(req.EblFilter.QuantityOfPackages, 'f', -1, 64)
+		types++
 	}
 	if req.EblFilter.GrossWeight != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"grossWeight\":" + strconv.FormatFloat(req.EblFilter.GrossWeight, 'f', -1, 64)
+		types++
 	}
 	if req.EblFilter.Measurement != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"measurement\":" + strconv.FormatFloat(req.EblFilter.Measurement, 'f', -1, 64)
+		types++
 	}
 	if req.EblFilter.NumOfEBL != 0 {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"numOfEbl\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
+		types++
 	}
 	if req.EblFilter.PlaceOfDelivery != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"placeOfDelivery\":\"" + req.EblFilter.PlaceOfDelivery + "\""
+		types++
 	}
 	if req.EblFilter.PlaceOfDestination != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"placeOfDestination\":\"" + req.EblFilter.PlaceOfDestination + "\""
+		types++
 	}
 	if req.EblFilter.PlaceOfIssue != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"placeOfIssue\":\"" + req.EblFilter.PlaceOfIssue + "\""
+		types++
 	}
 	if req.EblFilter.PlaceOfReceipt != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"placeOfReceipt\":\"" + req.EblFilter.PlaceOfReceipt + "\""
+		types++
 	}
 	if req.EblFilter.PortOfLoading != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"portOfLoading\":\"" + req.EblFilter.PortOfLoading + "\""
+		types++
 	}
 	if req.EblFilter.ShippingMarkes != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"shippingMarkes\":\"" + req.EblFilter.ShippingMarkes + "\""
+		types++
 	}
 	if req.EblFilter.FreightAndCharges != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"freightAndCharges\":\"" + req.EblFilter.FreightAndCharges + "\""
+		types++
 
 	}
 	if req.EblFilter.DescriptionOfGoods != "" {
@@ -246,12 +268,14 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 			selector += ","
 		}
 		selector += "\"descriptionOfGoods\":\"" + req.EblFilter.DescriptionOfGoods + "\""
+		types++
 	}
 	if req.EblFilter.DeliveryAgent != "" {
 		if types > 0 {
 			selector += ","
 		}
 		selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
+		types++
 	}
 	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
 	//selector = "{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
@@ -546,36 +570,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		req.Ebl.TransferCompanyID,                // transferCompanyID
-		req.Ebl.TransferCompanyName,              // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		req.Ebl.TransferCompanyID,                                    // transferCompanyID
+		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
