@@ -44,64 +44,7 @@ type FabricEblServiceImpl struct {
 	p Param
 }
 
-func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
-	if err != nil {
-		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-		return nil, err
-	}
-	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	}
-	walletName := company.Name + "_" + user.Name
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Println("Failed to create wallet: %v", err)
-	}
-	if !wallet.Exists(walletName) {
-		err = addUserToWallet(wallet, walletName)
-		if err != nil {
-			log.Println("Failed to populate wallet contents: %v", err)
-		}
-	}
-	ccpPath := filepath.Join(
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
-		"connection-org1.yaml",
-	)
-	gw, err := gateway.Connect(
-		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, walletName),
-	)
-	if err != nil {
-		log.Println("Failed to connect to gateway: %v", err)
-	}
-	defer gw.Close()
-	network, err := gw.GetNetwork("mychannel")
-	if err != nil {
-		log.Println("Failed to get network: %v", err)
-	}
-	contract := network.GetContract("basic")
-	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
-
-	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
+func generateSelectorString(req *fabric_ebl.QueryEblListReq) string {
 	types := 0
 	selector := "{\"selector\":{"
 	if req.EblFilter.EblNo != "" {
@@ -278,6 +221,67 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		types++
 	}
 	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	return selector
+}
+func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
+	token := req.Token
+	claims, err := jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, biz_error.ParseTokenError
+	}
+	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return nil, err
+	}
+	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	if err != nil {
+		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	}
+	walletName := company.Name + "_" + user.Name
+	wallet, err := gateway.NewFileSystemWallet("wallet")
+	if err != nil {
+		log.Println("Failed to create wallet: %v", err)
+	}
+	if !wallet.Exists(walletName) {
+		err = addUserToWallet(wallet, walletName)
+		if err != nil {
+			log.Println("Failed to populate wallet contents: %v", err)
+		}
+	}
+	ccpPath := filepath.Join(
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"connection-org1.yaml",
+	)
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, walletName),
+	)
+	if err != nil {
+		log.Println("Failed to connect to gateway: %v", err)
+	}
+	defer gw.Close()
+	network, err := gw.GetNetwork("mychannel")
+	if err != nil {
+		log.Println("Failed to get network: %v", err)
+	}
+	contract := network.GetContract("basic")
+	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
+
+	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
+	selector := generateSelectorString(req)
 	//selector = "{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
 	log.Println(selector)
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
@@ -589,8 +593,8 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		req.Ebl.ShippingMarkes,                                       // shippingMarkes
 		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
 		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
-		req.Ebl.TransferCompanyID,                                    // transferCompanyID
-		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		"",                                                           // transferCompanyID
+		"",                                                           // transferCompanyName
 		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
 		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
 		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
