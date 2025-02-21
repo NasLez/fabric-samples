@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fabric_ebl/biz_error"
@@ -11,6 +12,7 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/nguyenthenguyen/docx"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 	"io/ioutil"
@@ -387,7 +389,16 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		docx1.Replace("numOfEbl", strconv.FormatInt(req.Ebl.NumOfEBL, 10), -1)
 		docx1.Replace("dateOfIssueDeadline", strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10), -1)
 		docx1.WriteToFile("./" + req.Ebl.EblNo + ".docx")
-
+		file := fmt.Sprintf("./" + req.Ebl.EblNo + ".docx")
+		raw := Read(file)
+		if raw != nil {
+			hash, err := UploadIPFS(raw)
+			if err != nil {
+				log.Println("UploadIPFS failed, err = %v", err)
+				return nil, err
+			}
+			log.Println("hash", hash)
+		}
 	}
 	return &fabric_ebl.CreateEblResp{
 		Id: ID,
@@ -836,6 +847,34 @@ func GetEblByRangeWithPaginationResp2DO(result []byte) (*fabric_ebl.QueryAllEblL
 		Bookmark:            eblListResp.Bookmark,
 		FetchedRecordsCount: eblListResp.FetchedRecordsCount,
 	}, nil
+}
+
+func Read(filepath string) []byte {
+	f, err := os.Open(filepath)
+	if err != nil {
+		log.Println("read file fail", err)
+		return nil
+	}
+	defer f.Close()
+
+	fd, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Println("read to fd fail", err)
+		return nil
+	}
+
+	return fd
+}
+func UploadIPFS(raw []byte) (string, error) {
+	sh := shell.NewShell("localhost:5001")
+	reader := bytes.NewReader(raw)
+	// https://github.com/ipfs/go-ipfs-api/blob/master/add.go
+	fileHash, err := sh.Add(reader)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(fileHash)
+	return fileHash, nil
 }
 
 type Ebl struct {
