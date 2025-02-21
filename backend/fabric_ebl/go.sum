@@ -390,8 +390,6 @@ github.com/weppos/publicsuffix-go v0.5.0 h1:rutRtjBJViU/YjcI5d80t4JAVvDltS6bciJg
 github.com/weppos/publicsuffix-go v0.5.0/go.mod h1:z3LCPQ38eedDQSwmsSRW4Y7t2L8Ln16JPQ02lHAdn5k=
 github.com/wxl-server/common v0.0.0-20250124091328-b8c8589e8ad3 h1:Sghq0MCVOEmE05dbJXAx8O6QMyrPXRjSzHXC29+Y2iA=
 github.com/wxl-server/common v0.0.0-20250124091328-b8c8589e8ad3/go.mod h1:ttXl7msyGGdllN5iMbIwgQsQbEounzZqLFXBhPuokM8=
-github.com/wxl-server/idl_gen v0.0.0-20250220084501-e8ad3e44cba7 h1:EXmmHLQiFHwMo8rbpXyacaXXOxMXVfrzr/2UIwTyLjQ=
-github.com/wxl-server/idl_gen v0.0.0-20250220084501-e8ad3e44cba7/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/wxl-server/idl_gen v0.0.0-20250221070717-f8d6850f3404 h1:BwHW+6VLj9kf0PxeOGG9IFyRL4PXdgiNIeNbe4/3q+U=
 github.com/wxl-server/idl_gen v0.0.0-20250221070717-f8d6850f3404/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
