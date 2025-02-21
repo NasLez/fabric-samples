@@ -259,6 +259,7 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
 	if err != nil {
 		log.Fatalf("Failed to Submit transaction: %v", err)
+		return nil, nil
 	}
 	log.Println(string(result))
 	resp, err := GetEblByRangeWithPaginationResp2DO(result)
