@@ -8,8 +8,6 @@ import (
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"strconv"
-
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 )
 
@@ -53,10 +51,6 @@ func (h *QueryAllEblListHandler) handle() {
 
 }
 func (h *QueryAllEblListHandler) respRpc2Http(resp *fabric_ebl.QueryAllEblListResp) *model.QueryAllEblListData {
-	do, err := strconv.ParseInt(resp.Bookmark, 10, 64)
-	if err != nil {
-		logger.CtxErrorf(h.ctx, "QueryAllEblList failed, err = %v", err)
-	}
 	eblList := make([]*model.Ebl, 0)
 	for _, v := range resp.EblList {
 		eblList = append(eblList, &model.Ebl{
@@ -100,18 +94,17 @@ func (h *QueryAllEblListHandler) respRpc2Http(resp *fabric_ebl.QueryAllEblListRe
 		})
 	}
 	return &model.QueryAllEblListData{
-		Bookmark:            &do,
+		Bookmark:            &resp.Bookmark,
 		EblList:             eblList,
 		FetchedRecordsCount: &resp.FetchedRecordsCount,
 	}
 }
 func (h *QueryAllEblListHandler) reqHttp2Rpc(req *model.QueryAllEblListReq, token string) *fabric_ebl.QueryAllEblListReq {
 
-	do := strconv.FormatInt(*req.Bookmark, 10)
 	return &fabric_ebl.QueryAllEblListReq{
 		Token:    token,
 		PageSize: req.PageSize,
-		Bookmark: &do,
+		Bookmark: req.Bookmark,
 	}
 }
 
