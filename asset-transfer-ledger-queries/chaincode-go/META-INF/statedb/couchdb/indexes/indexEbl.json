@@ -24,7 +24,7 @@
       "dateOfIssue",
       "deliveryAgent",
       "shippedOnBoard",
-      "numOfEBL",
+      "numOfEbl",
       "dateOfIssueDeadline",
       "status",
       "transferCompanyID",

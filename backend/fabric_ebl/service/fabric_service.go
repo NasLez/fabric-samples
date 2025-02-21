@@ -196,7 +196,7 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		if types > 0 {
 			selector += ","
 		}
-		selector += "\"numOfEBL\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
+		selector += "\"numOfEbl\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
 	}
 	if req.EblFilter.PlaceOfDelivery != "" {
 		if types > 0 {
