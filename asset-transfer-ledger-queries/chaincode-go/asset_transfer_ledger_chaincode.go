@@ -209,44 +209,12 @@ func (t *SimpleChaincode) CreateAsset(ctx contractapi.TransactionContextInterfac
 }
 
 // CreateEbl initializes a new EBL (Electronic Bill of Lading) in the ledger
-func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface,
-	eblNo,
-	originCompanyID,
-	originCompanyName,
-	shipperCompanyID,
-	shipperCompanyName,
-	consigneeCompanyID,
-	consigneeCompanyName,
-	notifyPartyCompanyID,
-	notifyPartyCompanyName,
-	placeOfReceipt,
-	oceanVessel,
-	portOfLoading,
-	portOfDescharge,
-	placeOfDestination,
-	placeOfDelivery,
-	shippingMarkes,
-	contractFiles,
-	invoiceFiles,
-	transferCompanyID,
-	transferCompanyName,
-	kindOfPackagesGW,
-	kindOfPackagesM,
-	descriptionOfGoods,
-	deliveryAgent,
-	companyName,
-	freightAndCharges,
-	status,
-	file,
-	placeOfIssue string,
-	quantityOfPackages,
-	grossWeight,
-	measurement float64,
-	dateOfIssue,
-	shippedOnBoard,
-	numOfEBL,
-	dateOfIssueDeadline,
-	companyID int64) error {
+func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface, eblNo, originCompanyID, originCompanyName, shipperCompanyID, shipperCompanyName,
+	consigneeCompanyID, consigneeCompanyName, notifyPartyCompanyID, notifyPartyCompanyName, placeOfReceipt, oceanVessel, portOfLoading, portOfDescharge, placeOfDestination,
+	placeOfDelivery, shippingMarkes, contractFiles, invoiceFiles, transferCompanyID, transferCompanyName, kindOfPackagesGW, kindOfPackagesM, descriptionOfGoods, deliveryAgent,
+	companyName, freightAndCharges, status, file, placeOfIssue string,
+	quantityOfPackages, grossWeight, measurement float64,
+	dateOfIssue, shippedOnBoard, numOfEBL, dateOfIssueDeadline, companyID int64) error {
 	// Check if the EBL already exists
 	exists, err := t.EblExists(ctx, eblNo)
 	if err != nil {
@@ -448,14 +416,6 @@ func constructEblQueryResponseFromIterator(resultsIterator shim.StateQueryIterat
 	return ebls, nil
 }
 
-// GetAssetsByRange performs a range query based on the start and end keys provided.
-// Read-only function results are not typically submitted to ordering. If the read-only
-// results are submitted to ordering, or if the query is used in an update transaction
-// and submitted to ordering, then the committing peers will re-execute to guarantee that
-// result sets are stable between endorsement time and commit time. The transaction is
-// invalidated by the committing peers if the result set has changed between endorsement
-// time and commit time.
-// Therefore, range queries are a safe option for performing update transactions based on query results.
 func (t *SimpleChaincode) GetAssetsByRange(ctx contractapi.TransactionContextInterface, startKey, endKey string) ([]*Asset, error) {
 	resultsIterator, err := ctx.GetStub().GetStateByRange(startKey, endKey)
 	if err != nil {
@@ -466,13 +426,6 @@ func (t *SimpleChaincode) GetAssetsByRange(ctx contractapi.TransactionContextInt
 	return constructQueryResponseFromIterator(resultsIterator)
 }
 
-// TransferAssetByColor will transfer assets of a given color to a certain new owner.
-// Uses GetStateByPartialCompositeKey (range query) against color~name 'index'.
-// Committing peers will re-execute range queries to guarantee that result sets are stable
-// between endorsement time and commit time. The transaction is invalidated by the
-// committing peers if the result set has changed between endorsement time and commit time.
-// Therefore, range queries are a safe option for performing update transactions based on query results.
-// Example: GetStateByPartialCompositeKey/RangeQuery
 func (t *SimpleChaincode) TransferAssetByColor(ctx contractapi.TransactionContextInterface, color, newOwner string) error {
 	// Execute a key range query on all keys starting with 'color'
 	coloredAssetResultsIterator, err := ctx.GetStub().GetStateByPartialCompositeKey(index, []string{color})
@@ -513,28 +466,15 @@ func (t *SimpleChaincode) TransferAssetByColor(ctx contractapi.TransactionContex
 	return nil
 }
 
-// QueryAssetsByOwner queries for assets based on the owners name.
-// This is an example of a parameterized query where the query logic is baked into the chaincode,
-// and accepting a single query parameter (owner).
-// Only available on state databases that support rich query (e.g. CouchDB)
-// Example: Parameterized rich query
 func (t *SimpleChaincode) QueryAssetsByOwner(ctx contractapi.TransactionContextInterface, owner string) ([]*Asset, error) {
 	queryString := fmt.Sprintf(`{"selector":{"docType":"asset","owner":"%s"}}`, owner)
 	return getQueryResultForQueryString(ctx, queryString)
 }
 
-// QueryAssets uses a query string to perform a query for assets.
-// Query string matching state database syntax is passed in and executed as is.
-// Supports ad hoc queries that can be defined at runtime by the client.
-// If this is not desired, follow the QueryAssetsForOwner example for parameterized queries.
-// Only available on state databases that support rich query (e.g. CouchDB)
-// Example: Ad hoc rich query
 func (t *SimpleChaincode) QueryAssets(ctx contractapi.TransactionContextInterface, queryString string) ([]*Asset, error) {
 	return getQueryResultForQueryString(ctx, queryString)
 }
 
-// getQueryResultForQueryString executes the passed in query string.
-// The result set is built and returned as a byte array containing the JSON results.
 func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, queryString string) ([]*Asset, error) {
 	resultsIterator, err := ctx.GetStub().GetQueryResult(queryString)
 	if err != nil {
@@ -545,11 +485,6 @@ func getQueryResultForQueryString(ctx contractapi.TransactionContextInterface, q
 	return constructQueryResponseFromIterator(resultsIterator)
 }
 
-// GetAssetsByRangeWithPagination performs a range query based on the start and end key,
-// page size and a bookmark.
-// The number of fetched records will be equal to or lesser than the page size.
-// Paginated range queries are only valid for read only transactions.
-// Example: Pagination with Range Query
 func (t *SimpleChaincode) GetAssetsByRangeWithPagination(ctx contractapi.TransactionContextInterface, startKey string, endKey string, pageSize int, bookmark string) (*PaginatedQueryResult, error) {
 
 	resultsIterator, responseMetadata, err := ctx.GetStub().GetStateByRangeWithPagination(startKey, endKey, int32(pageSize), bookmark)
@@ -568,14 +503,23 @@ func (t *SimpleChaincode) GetAssetsByRangeWithPagination(ctx contractapi.Transac
 	}, nil
 }
 
-// QueryAssetsWithPagination uses a query string, page size and a bookmark to perform a query
-// for assets. Query string matching state database syntax is passed in and executed as is.
-// The number of fetched records would be equal to or lesser than the specified page size.
-// Supports ad hoc queries that can be defined at runtime by the client.
-// If this is not desired, follow the QueryAssetsForOwner example for parameterized queries.
-// Only available on state databases that support rich query (e.g. CouchDB)
-// Paginated queries are only valid for read only transactions.
-// Example: Pagination with Ad hoc Rich Query
+func (t *SimpleChaincode) GetEblByRangeWithPagination(ctx contractapi.TransactionContextInterface, startKey string, endKey string, pageSize int, bookmark string) (*EblPaginatedQueryResult, error) {
+	resultsIterator, responseMetadata, err := ctx.GetStub().GetStateByRangeWithPagination(startKey, endKey, int32(pageSize), bookmark)
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+	ebls, err := constructEblQueryResponseFromIterator(resultsIterator)
+	if err != nil {
+		return nil, err
+	}
+	return &EblPaginatedQueryResult{
+		Records:             ebls,
+		FetchedRecordsCount: responseMetadata.FetchedRecordsCount,
+		Bookmark:            responseMetadata.Bookmark,
+	}, nil
+}
+
 func (t *SimpleChaincode) QueryAssetsWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int, bookmark string) (*PaginatedQueryResult, error) {
 
 	return getQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
@@ -585,8 +529,6 @@ func (t *SimpleChaincode) QueryEblWithPagination(ctx contractapi.TransactionCont
 	return getEblQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
 }
 
-// getQueryResultForQueryStringWithPagination executes the passed in query string with
-// pagination info. The result set is built and returned as a byte array containing the JSON results.
 func getQueryResultForQueryStringWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int32, bookmark string) (*PaginatedQueryResult, error) {
 
 	resultsIterator, responseMetadata, err := ctx.GetStub().GetQueryResultWithPagination(queryString, pageSize, bookmark)
