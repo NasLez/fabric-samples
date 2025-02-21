@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fabric_ebl/biz_error"
 	"fabric_ebl/common/id_gen"
 	"fabric_ebl/domain/converter"
@@ -30,6 +31,7 @@ type FabricEblService interface {
 	GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error)
 	GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error)
 	CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error)
+	QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error)
 }
 
 type Param struct {
@@ -41,6 +43,176 @@ type FabricEblServiceImpl struct {
 	p Param
 }
 
+func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error) {
+	token := req.Token
+	claims, err := jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, biz_error.ParseTokenError
+	}
+	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return nil, err
+	}
+	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	if err != nil {
+		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	}
+	walletName := company.Name + "_" + user.Name
+	wallet, err := gateway.NewFileSystemWallet("wallet")
+	if err != nil {
+		log.Fatalf("Failed to create wallet: %v", err)
+	}
+	if !wallet.Exists(walletName) {
+		err = addUserToWallet(wallet, walletName)
+		if err != nil {
+			log.Fatalf("Failed to populate wallet contents: %v", err)
+		}
+	}
+	ccpPath := filepath.Join(
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"connection-org1.yaml",
+	)
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, walletName),
+	)
+	if err != nil {
+		log.Fatalf("Failed to connect to gateway: %v", err)
+	}
+	defer gw.Close()
+	network, err := gw.GetNetwork("mychannel")
+	if err != nil {
+		log.Fatalf("Failed to get network: %v", err)
+	}
+	contract := network.GetContract("basic")
+	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
+
+	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
+	result, err := contract.SubmitTransaction("GetEblByRangeWithPagination", "", "", contractPageSize, *req.Bookmark)
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+	resp, err := GetEblByRangeWithPaginationResp2DO(result)
+	if err != nil {
+		log.Fatalf("Failed to convert result: %v", err)
+	}
+	return resp, nil
+}
+
+type Ebl struct {
+	EblNo                  string  `thrift:"eblNo,1,required" frugal:"1,required,string" json:"eblNo"`
+	OriginCompanyID        string  `thrift:"originCompanyID,2,required" frugal:"2,required,string" json:"originCompanyID"`
+	OriginCompanyName      string  `thrift:"originCompanyName,3,required" frugal:"3,required,string" json:"originCompanyName"`
+	ShipperCompanyID       string  `thrift:"shipperCompanyID,4,required" frugal:"4,required,string" json:"shipperCompanyID"`
+	ShipperCompanyName     string  `thrift:"shipperCompanyName,5,required" frugal:"5,required,string" json:"shipperCompanyName"`
+	ConsigneeCompanyID     string  `thrift:"consigneeCompanyID,6,required" frugal:"6,required,string" json:"consigneeCompanyID"`
+	ConsigneeCompanyName   string  `thrift:"consigneeCompanyName,7,required" frugal:"7,required,string" json:"consigneeCompanyName"`
+	NotifyPartyCompanyID   string  `thrift:"notifyPartyCompanyID,8,required" frugal:"8,required,string" json:"notifyPartyCompanyID"`
+	NotifyPartyCompanyName string  `thrift:"notifyPartyCompanyName,9,required" frugal:"9,required,string" json:"notifyPartyCompanyName"`
+	PlaceOfReceipt         string  `thrift:"placeOfReceipt,10,required" frugal:"10,required,string" json:"placeOfReceipt"`
+	OceanVessel            string  `thrift:"oceanVessel,11,required" frugal:"11,required,string" json:"oceanVessel"`
+	PortOfLoading          string  `thrift:"portOfLoading,12,required" frugal:"12,required,string" json:"portOfLoading"`
+	PortOfDescharge        string  `thrift:"portOfDescharge,13,required" frugal:"13,required,string" json:"portOfDescharge"`
+	PlaceOfDestination     string  `thrift:"placeOfDestination,14,required" frugal:"14,required,string" json:"placeOfDestination"`
+	PlaceOfDelivery        string  `thrift:"placeOfDelivery,15,required" frugal:"15,required,string" json:"placeOfDelivery"`
+	ShippingMarkes         string  `thrift:"shippingMarkes,16,required" frugal:"16,required,string" json:"shippingMarkes"`
+	QuantityOfPackages     float64 `thrift:"quantityOfPackages,17,required" frugal:"17,required,double" json:"quantityOfPackages"`
+	KindOfPackagesGW       string  `thrift:"kindOfPackagesGW,18,required" frugal:"18,required,string" json:"kindOfPackagesGW"`
+	KindOfPackagesM        string  `thrift:"kindOfPackagesM,19,required" frugal:"19,required,string" json:"kindOfPackagesM"`
+	DescriptionOfGoods     string  `thrift:"descriptionOfGoods,20,required" frugal:"20,required,string" json:"descriptionOfGoods"`
+	GrossWeight            float64 `thrift:"grossWeight,21,required" frugal:"21,required,double" json:"grossWeight"`
+	Measurement            float64 `thrift:"measurement,22,required" frugal:"22,required,double" json:"measurement"`
+	FreightAndCharges      string  `thrift:"freightAndCharges,23,required" frugal:"23,required,string" json:"freightAndCharges"`
+	PlaceOfIssue           string  `thrift:"placeOfIssue,24,required" frugal:"24,required,string" json:"placeOfIssue"`
+	DateOfIssue            int64   `thrift:"dateOfIssue,25,required" frugal:"25,required,i64" json:"dateOfIssue"`
+	DeliveryAgent          string  `thrift:"deliveryAgent,26,required" frugal:"26,required,string" json:"deliveryAgent"`
+	ShippedOnBoard         int64   `thrift:"shippedOnBoard,27,required" frugal:"27,required,i64" json:"shippedOnBoard"`
+	NumOfEBL               int64   `thrift:"numOfEBL,28,required" frugal:"28,required,i64" json:"numOfEBL"`
+	DateOfIssueDeadline    int64   `thrift:"dateOfIssueDeadline,29,required" frugal:"29,required,i64" json:"dateOfIssueDeadline"`
+	Status                 string  `thrift:"status,30,required" frugal:"30,required,string" json:"status"`
+	File                   string  `thrift:"file,31,required" frugal:"31,required,string" json:"file"`
+	ContractFiles          string  `thrift:"contractFiles,32,required" frugal:"32,required,string" json:"contractFiles"`
+	InvoiceFiles           string  `thrift:"invoiceFiles,33,required" frugal:"33,required,string" json:"invoiceFiles"`
+	TransferCompanyID      string  `thrift:"transferCompanyID,34,required" frugal:"34,required,string" json:"transferCompanyID"`
+	TransferCompanyName    string  `thrift:"transferCompanyName,35,required" frugal:"35,required,string" json:"transferCompanyName"`
+	CompanyID              int64   `thrift:"companyID,36,required" frugal:"36,required,i64" json:"companyID"`
+	CompanyName            string  `thrift:"companyName,37,required" frugal:"37,required,string" json:"companyName"`
+}
+type GetEblByRangeWithPaginationResp struct {
+	Records             []*Ebl `thrift:"records,1,required" frugal:"1,required" json:"records"`
+	FetchedRecordsCount string `thrift:"fetchedRecordsCount,2,required" frugal:"2,required,string" json:"fetchedRecordsCount"`
+	Bookmark            string `thrift:"bookmark,3,required" frugal:"3,required,string" json:"bookmark"`
+}
+
+func GetEblByRangeWithPaginationResp2DO(result []byte) (*fabric_ebl.QueryAllEblListResp, error) {
+	var eblListResp GetEblByRangeWithPaginationResp
+	err := json.Unmarshal(result, &eblListResp)
+	if err != nil {
+		return nil, err
+	}
+	var eblList []*fabric_ebl.Ebl
+	for _, ebl := range eblListResp.Records {
+		eblList = append(eblList, &fabric_ebl.Ebl{
+			EblNo:                  ebl.EblNo,
+			OriginCompanyID:        ebl.OriginCompanyID,
+			OriginCompanyName:      ebl.OriginCompanyName,
+			ShipperCompanyID:       ebl.ShipperCompanyID,
+			ShipperCompanyName:     ebl.ShipperCompanyName,
+			ConsigneeCompanyID:     ebl.ConsigneeCompanyID,
+			ConsigneeCompanyName:   ebl.ConsigneeCompanyName,
+			NotifyPartyCompanyID:   ebl.NotifyPartyCompanyID,
+			NotifyPartyCompanyName: ebl.NotifyPartyCompanyName,
+			PlaceOfReceipt:         ebl.PlaceOfReceipt,
+			OceanVessel:            ebl.OceanVessel,
+			PortOfLoading:          ebl.PortOfLoading,
+			PortOfDescharge:        ebl.PortOfDescharge,
+			PlaceOfDestination:     ebl.PlaceOfDestination,
+			PlaceOfDelivery:        ebl.PlaceOfDelivery,
+			ShippingMarkes:         ebl.ShippingMarkes,
+			QuantityOfPackages:     ebl.QuantityOfPackages,
+			KindOfPackagesGW:       ebl.KindOfPackagesGW,
+			KindOfPackagesM:        ebl.KindOfPackagesM,
+			DescriptionOfGoods:     ebl.DescriptionOfGoods,
+			GrossWeight:            ebl.GrossWeight,
+			Measurement:            ebl.Measurement,
+			FreightAndCharges:      ebl.FreightAndCharges,
+			PlaceOfIssue:           ebl.PlaceOfIssue,
+			DateOfIssue:            ebl.DateOfIssue,
+			DeliveryAgent:          ebl.DeliveryAgent,
+			ShippedOnBoard:         ebl.ShippedOnBoard,
+			NumOfEBL:               ebl.NumOfEBL,
+			DateOfIssueDeadline:    ebl.DateOfIssueDeadline,
+			Status:                 ebl.Status,
+			File:                   ebl.File,
+			ContractFiles:          strings.Split(ebl.ContractFiles, ";"),
+			InvoiceFiles:           strings.Split(ebl.InvoiceFiles, ";"),
+			TransferCompanyID:      ebl.TransferCompanyID,
+			TransferCompanyName:    ebl.TransferCompanyName,
+			CompanyID:              ebl.CompanyID,
+			CompanyName:            ebl.CompanyName,
+		})
+	}
+	do, err := strconv.ParseInt(eblListResp.FetchedRecordsCount, 10, 64)
+	return &fabric_ebl.QueryAllEblListResp{
+		EblList:             eblList,
+		Bookmark:            eblListResp.Bookmark,
+		FetchedRecordsCount: do,
+	}, nil
+}
 func NewUserService(p Param) FabricEblService {
 	return &FabricEblServiceImpl{
 		p: p,
@@ -145,36 +317,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		req.Ebl.TransferCompanyID,                // transferCompanyID
-		req.Ebl.TransferCompanyName,              // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		req.Ebl.TransferCompanyID,                                    // transferCompanyID
+		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement

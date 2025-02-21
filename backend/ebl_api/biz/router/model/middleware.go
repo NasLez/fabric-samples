@@ -55,3 +55,8 @@ func _createeblMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _queryallebllistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

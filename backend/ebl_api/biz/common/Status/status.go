@@ -44,4 +44,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("create ebl error"),
 	}
+	QueryAllEblListError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("query all ebl list error"),
+	}
 )
