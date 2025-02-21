@@ -102,7 +102,6 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
 
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
-	//selector:="{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
 	types := 0
 	selector := "{\"selector\":{"
 	if req.EblFilter.EblNo != "" {
@@ -255,6 +254,7 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
 	}
 	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	selector = "{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
 	log.Println(selector)
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
 	if err != nil {
