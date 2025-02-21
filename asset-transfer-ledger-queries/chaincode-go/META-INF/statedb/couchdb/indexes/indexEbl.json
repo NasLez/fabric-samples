@@ -1,0 +1,11 @@
+{
+  "index": {
+    "fields": [
+      "eblNo",
+      "originCompanyID"
+    ]
+  },
+  "ddoc": "indexEblDoc",
+  "name": "indexEbl",
+  "type": "json"
+}

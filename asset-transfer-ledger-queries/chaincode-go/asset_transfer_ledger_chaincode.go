@@ -537,6 +537,10 @@ func (t *SimpleChaincode) QueryAssetsWithPagination(ctx contractapi.TransactionC
 	return getQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
 }
 
+func (t *SimpleChaincode) QueryEblWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int, bookmark string) (*PaginatedQueryResult, error) {
+	return getQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
+}
+
 // getQueryResultForQueryStringWithPagination executes the passed in query string with
 // pagination info. The result set is built and returned as a byte array containing the JSON results.
 func getQueryResultForQueryStringWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int32, bookmark string) (*PaginatedQueryResult, error) {
