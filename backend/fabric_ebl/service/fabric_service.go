@@ -64,17 +64,17 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 	}
 	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
 	}
 	walletName := company.Name + "_" + user.Name
 	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
+		log.Println("Failed to create wallet: %v", err)
 	}
 	if !wallet.Exists(walletName) {
 		err = addUserToWallet(wallet, walletName)
 		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
+			log.Println("Failed to populate wallet contents: %v", err)
 		}
 	}
 	ccpPath := filepath.Join(
@@ -91,12 +91,12 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		gateway.WithIdentity(wallet, walletName),
 	)
 	if err != nil {
-		log.Fatalf("Failed to connect to gateway: %v", err)
+		log.Println("Failed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
 	network, err := gw.GetNetwork("mychannel")
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		log.Println("Failed to get network: %v", err)
 	}
 	contract := network.GetContract("basic")
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
@@ -258,13 +258,13 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 	log.Println(selector)
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
 	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
+		log.Println("Failed to Submit transaction: %v", err)
 		return nil, nil
 	}
 	log.Println(string(result))
 	resp, err := GetEblByRangeWithPaginationResp2DO(result)
 	if err != nil {
-		log.Fatalf("Failed to convert result: %v", err)
+		log.Println("Failed to convert result: %v", err)
 	}
 	return &fabric_ebl.QueryEblListResp{
 		EblList:             resp.EblList,
@@ -293,17 +293,17 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 	}
 	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
 	}
 	walletName := company.Name + "_" + user.Name
 	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
+		log.Println("Failed to create wallet: %v", err)
 	}
 	if !wallet.Exists(walletName) {
 		err = addUserToWallet(wallet, walletName)
 		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
+			log.Println("Failed to populate wallet contents: %v", err)
 		}
 	}
 	ccpPath := filepath.Join(
@@ -320,12 +320,12 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 		gateway.WithIdentity(wallet, walletName),
 	)
 	if err != nil {
-		log.Fatalf("Failed to connect to gateway: %v", err)
+		log.Println("Failed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
 	network, err := gw.GetNetwork("mychannel")
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		log.Println("Failed to get network: %v", err)
 	}
 	contract := network.GetContract("basic")
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
@@ -333,12 +333,12 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
 	result, err := contract.SubmitTransaction("GetEblByRangeWithPagination", "", "", contractPageSize, *req.Bookmark)
 	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
+		log.Println("Failed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 	resp, err := GetEblByRangeWithPaginationResp2DO(result)
 	if err != nil {
-		log.Fatalf("Failed to convert result: %v", err)
+		log.Println("Failed to convert result: %v", err)
 	}
 	return resp, nil
 }
@@ -507,17 +507,17 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 
 	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
 	if err != nil {
-		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
 	}
 	walletName := company.Name + "_" + user.Name
 	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
-		log.Fatalf("Failed to create wallet: %v", err)
+		log.Println("Failed to create wallet: %v", err)
 	}
 	if !wallet.Exists(walletName) {
 		err = addUserToWallet(wallet, walletName)
 		if err != nil {
-			log.Fatalf("Failed to populate wallet contents: %v", err)
+			log.Println("Failed to populate wallet contents: %v", err)
 		}
 	}
 	ccpPath := filepath.Join(
@@ -534,12 +534,12 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		gateway.WithIdentity(wallet, walletName),
 	)
 	if err != nil {
-		log.Fatalf("Failed to connect to gateway: %v", err)
+		log.Println("Failed to connect to gateway: %v", err)
 	}
 	defer gw.Close()
 	network, err := gw.GetNetwork("mychannel")
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		log.Println("Failed to get network: %v", err)
 	}
 	contract := network.GetContract("basic")
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
@@ -586,7 +586,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		strconv.FormatInt(req.Ebl.CompanyID, 10),                     // companyID
 	)
 	if err != nil {
-		log.Fatalf("Failed to Submit transaction: %v", err)
+		log.Println("Failed to Submit transaction: %v", err)
 	}
 	log.Println(string(result))
 
@@ -594,7 +594,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	log.Println("--> Evaluate Transaction: ReadEbl, function returns EBL with given eblNo")
 	result, err = contract.EvaluateTransaction("ReadEbl", req.Ebl.EblNo)
 	if err != nil {
-		log.Fatalf("Failed to evaluate transaction: %v\n", err)
+		log.Println("Failed to evaluate transaction: %v\n", err)
 	}
 	log.Println(string(result))
 	return &fabric_ebl.CreateEblResp{
@@ -750,7 +750,7 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 	{
 		wallet, err := gateway.NewFileSystemWallet("wallet")
 		if err != nil {
-			log.Fatalf("Failed to create wallet: %v", err)
+			log.Println("Failed to create wallet: %v", err)
 		}
 
 		walletName := req.CompanyName + "_" + req.AdminName
@@ -758,7 +758,7 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 		if !wallet.Exists(walletName) {
 			err = addUserToWallet(wallet, walletName)
 			if err != nil {
-				log.Fatalf("Failed to populate wallet contents: %v", err)
+				log.Println("Failed to populate wallet contents: %v", err)
 			}
 		}
 
