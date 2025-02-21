@@ -60,3 +60,8 @@ func _queryallebllistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _queryebllistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

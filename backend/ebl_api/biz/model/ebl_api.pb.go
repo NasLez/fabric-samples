@@ -1188,6 +1188,195 @@ func (x *QueryAllEblListData) GetBookmark() string {
 	return ""
 }
 
+type QueryEblListReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PageSize *int64  `protobuf:"varint,1,req,name=page_size,json=pageSize" form:"page_size,required" json:"page_size,required"`
+	Bookmark *string `protobuf:"bytes,2,req,name=bookmark" form:"bookmark,required" json:"bookmark,required"`
+	Ebl      *Ebl    `protobuf:"bytes,3,req,name=ebl" form:"ebl,required" json:"ebl,required"`
+}
+
+func (x *QueryEblListReq) Reset() {
+	*x = QueryEblListReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryEblListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryEblListReq) ProtoMessage() {}
+
+func (x *QueryEblListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryEblListReq.ProtoReflect.Descriptor instead.
+func (*QueryEblListReq) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *QueryEblListReq) GetPageSize() int64 {
+	if x != nil && x.PageSize != nil {
+		return *x.PageSize
+	}
+	return 0
+}
+
+func (x *QueryEblListReq) GetBookmark() string {
+	if x != nil && x.Bookmark != nil {
+		return *x.Bookmark
+	}
+	return ""
+}
+
+func (x *QueryEblListReq) GetEbl() *Ebl {
+	if x != nil {
+		return x.Ebl
+	}
+	return nil
+}
+
+type QueryEblListResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Code    *int64            `protobuf:"varint,1,req,name=code" form:"code,required" json:"code,required" query:"code,required"`
+	Message *string           `protobuf:"bytes,2,req,name=message" form:"message,required" json:"message,required" query:"message,required"`
+	Data    *QueryEblListData `protobuf:"bytes,3,opt,name=data" form:"data" json:"data,omitempty" query:"data"`
+}
+
+func (x *QueryEblListResp) Reset() {
+	*x = QueryEblListResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryEblListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryEblListResp) ProtoMessage() {}
+
+func (x *QueryEblListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryEblListResp.ProtoReflect.Descriptor instead.
+func (*QueryEblListResp) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *QueryEblListResp) GetCode() int64 {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return 0
+}
+
+func (x *QueryEblListResp) GetMessage() string {
+	if x != nil && x.Message != nil {
+		return *x.Message
+	}
+	return ""
+}
+
+func (x *QueryEblListResp) GetData() *QueryEblListData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type QueryEblListData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EblList             []*Ebl  `protobuf:"bytes,1,rep,name=ebl_list,json=eblList" form:"ebl_list" json:"ebl_list,omitempty" query:"ebl_list"`
+	FetchedRecordsCount *int64  `protobuf:"varint,2,req,name=fetchedRecordsCount" form:"fetchedRecordsCount,required" json:"fetchedRecordsCount,required" query:"fetchedRecordsCount,required"`
+	Bookmark            *string `protobuf:"bytes,3,req,name=bookmark" form:"bookmark,required" json:"bookmark,required" query:"bookmark,required"`
+}
+
+func (x *QueryEblListData) Reset() {
+	*x = QueryEblListData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryEblListData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryEblListData) ProtoMessage() {}
+
+func (x *QueryEblListData) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryEblListData.ProtoReflect.Descriptor instead.
+func (*QueryEblListData) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *QueryEblListData) GetEblList() []*Ebl {
+	if x != nil {
+		return x.EblList
+	}
+	return nil
+}
+
+func (x *QueryEblListData) GetFetchedRecordsCount() int64 {
+	if x != nil && x.FetchedRecordsCount != nil {
+		return *x.FetchedRecordsCount
+	}
+	return 0
+}
+
+func (x *QueryEblListData) GetBookmark() string {
+	if x != nil && x.Bookmark != nil {
+		return *x.Bookmark
+	}
+	return ""
+}
+
 type Company struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1202,7 +1391,7 @@ type Company struct {
 func (x *Company) Reset() {
 	*x = Company{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ebl_api_proto_msgTypes[18]
+		mi := &file_ebl_api_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1215,7 +1404,7 @@ func (x *Company) String() string {
 func (*Company) ProtoMessage() {}
 
 func (x *Company) ProtoReflect() protoreflect.Message {
-	mi := &file_ebl_api_proto_msgTypes[18]
+	mi := &file_ebl_api_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1228,7 +1417,7 @@ func (x *Company) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Company.ProtoReflect.Descriptor instead.
 func (*Company) Descriptor() ([]byte, []int) {
-	return file_ebl_api_proto_rawDescGZIP(), []int{18}
+	return file_ebl_api_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *Company) GetId() int64 {
@@ -1306,7 +1495,7 @@ type Ebl struct {
 func (x *Ebl) Reset() {
 	*x = Ebl{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ebl_api_proto_msgTypes[19]
+		mi := &file_ebl_api_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1319,7 +1508,7 @@ func (x *Ebl) String() string {
 func (*Ebl) ProtoMessage() {}
 
 func (x *Ebl) ProtoReflect() protoreflect.Message {
-	mi := &file_ebl_api_proto_msgTypes[19]
+	mi := &file_ebl_api_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1332,7 +1521,7 @@ func (x *Ebl) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ebl.ProtoReflect.Descriptor instead.
 func (*Ebl) Descriptor() ([]byte, []int) {
-	return file_ebl_api_proto_rawDescGZIP(), []int{19}
+	return file_ebl_api_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Ebl) GetEblNo() string {
@@ -1721,6 +1910,31 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x20, 0x02, 0x28, 0x03, 0x52, 0x13, 0x66, 0x65, 0x74, 0x63, 0x68, 0x65, 0x64, 0x52, 0x65, 0x63,
 	0x6f, 0x72, 0x64, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x62, 0x6f, 0x6f,
 	0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x18, 0x03, 0x20, 0x02, 0x28, 0x09, 0x52, 0x08, 0x62, 0x6f, 0x6f,
+	0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x22, 0x90, 0x01, 0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45,
+	0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x12, 0x2a, 0x0a, 0x09, 0x70, 0x61, 0x67,
+	0x65, 0x5f, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x42, 0x0d, 0xca, 0xbb,
+	0x18, 0x09, 0x70, 0x61, 0x67, 0x65, 0x5f, 0x73, 0x69, 0x7a, 0x65, 0x52, 0x08, 0x70, 0x61, 0x67,
+	0x65, 0x53, 0x69, 0x7a, 0x65, 0x12, 0x28, 0x0a, 0x08, 0x62, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72,
+	0x6b, 0x18, 0x02, 0x20, 0x02, 0x28, 0x09, 0x42, 0x0c, 0xca, 0xbb, 0x18, 0x08, 0x62, 0x6f, 0x6f,
+	0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x52, 0x08, 0x62, 0x6f, 0x6f, 0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x12,
+	0x27, 0x0a, 0x03, 0x65, 0x62, 0x6c, 0x18, 0x03, 0x20, 0x02, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x65,
+	0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x62, 0x6c, 0x42, 0x07, 0xca, 0xbb, 0x18, 0x03,
+	0x65, 0x62, 0x6c, 0x52, 0x03, 0x65, 0x62, 0x6c, 0x22, 0x6f, 0x0a, 0x10, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65,
+	0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x02, 0x28,
+	0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x2d, 0x0a, 0x04, 0x64, 0x61,
+	0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61,
+	0x70, 0x69, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x44,
+	0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x89, 0x01, 0x0a, 0x10, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x27,
+	0x0a, 0x08, 0x65, 0x62, 0x6c, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x0c, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x45, 0x62, 0x6c, 0x52, 0x07,
+	0x65, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x30, 0x0a, 0x13, 0x66, 0x65, 0x74, 0x63, 0x68,
+	0x65, 0x64, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02,
+	0x20, 0x02, 0x28, 0x03, 0x52, 0x13, 0x66, 0x65, 0x74, 0x63, 0x68, 0x65, 0x64, 0x52, 0x65, 0x63,
+	0x6f, 0x72, 0x64, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x62, 0x6f, 0x6f,
+	0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x18, 0x03, 0x20, 0x02, 0x28, 0x09, 0x52, 0x08, 0x62, 0x6f, 0x6f,
 	0x6b, 0x6d, 0x61, 0x72, 0x6b, 0x22, 0x98, 0x01, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x6e,
 	0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x52, 0x02, 0x69,
 	0x64, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x5f, 0x63, 0x6f, 0x64,
@@ -1829,7 +2043,7 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x04, 0x53, 0x68, 0x69, 0x70, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x42, 0x61, 0x6e, 0x6b, 0x10,
 	0x02, 0x12, 0x0a, 0x0a, 0x06, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x10, 0x03, 0x2a, 0x1f, 0x0a,
 	0x08, 0x55, 0x73, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x12, 0x09, 0x0a, 0x05, 0x41, 0x64, 0x6d,
-	0x69, 0x6e, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x55, 0x73, 0x65, 0x72, 0x10, 0x02, 0x32, 0x87,
+	0x69, 0x6e, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x55, 0x73, 0x65, 0x72, 0x10, 0x02, 0x32, 0xdc,
 	0x04, 0x0a, 0x06, 0x45, 0x62, 0x6c, 0x41, 0x70, 0x69, 0x12, 0x3f, 0x0a, 0x05, 0x4c, 0x6f, 0x67,
 	0x69, 0x6e, 0x12, 0x11, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x4c, 0x6f, 0x67,
 	0x69, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x12, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e,
@@ -1862,8 +2076,14 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x6c, 0x6c, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x65,
 	0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x6c, 0x6c, 0x45,
 	0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x22, 0x0c, 0xd2, 0xc1, 0x18, 0x08,
-	0x2f, 0x65, 0x62, 0x6c, 0x2f, 0x61, 0x6c, 0x6c, 0x42, 0x13, 0x5a, 0x11, 0x65, 0x62, 0x6c, 0x5f,
-	0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c,
+	0x2f, 0x65, 0x62, 0x6c, 0x2f, 0x61, 0x6c, 0x6c, 0x12, 0x53, 0x0a, 0x0c, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x18, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61,
+	0x70, 0x69, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52,
+	0x65, 0x71, 0x1a, 0x19, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x45, 0x62, 0x6c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x22, 0x0e, 0xd2,
+	0xc1, 0x18, 0x0a, 0x2f, 0x65, 0x62, 0x6c, 0x2f, 0x71, 0x75, 0x65, 0x72, 0x79, 0x42, 0x13, 0x5a,
+	0x11, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x6d, 0x6f, 0x64,
+	0x65, 0x6c,
 }
 
 var (
@@ -1879,7 +2099,7 @@ func file_ebl_api_proto_rawDescGZIP() []byte {
 }
 
 var file_ebl_api_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_ebl_api_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_ebl_api_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_ebl_api_proto_goTypes = []interface{}{
 	(CompanyType)(0),              // 0: ebl_api.CompanyType
 	(UserType)(0),                 // 1: ebl_api.UserType
@@ -1901,8 +2121,11 @@ var file_ebl_api_proto_goTypes = []interface{}{
 	(*QueryAllEblListReq)(nil),    // 17: ebl_api.QueryAllEblListReq
 	(*QueryAllEblListResp)(nil),   // 18: ebl_api.QueryAllEblListResp
 	(*QueryAllEblListData)(nil),   // 19: ebl_api.QueryAllEblListData
-	(*Company)(nil),               // 20: ebl_api.Company
-	(*Ebl)(nil),                   // 21: ebl_api.Ebl
+	(*QueryEblListReq)(nil),       // 20: ebl_api.QueryEblListReq
+	(*QueryEblListResp)(nil),      // 21: ebl_api.QueryEblListResp
+	(*QueryEblListData)(nil),      // 22: ebl_api.QueryEblListData
+	(*Company)(nil),               // 23: ebl_api.Company
+	(*Ebl)(nil),                   // 24: ebl_api.Ebl
 }
 var file_ebl_api_proto_depIdxs = []int32{
 	4,  // 0: ebl_api.LoginResp.data:type_name -> ebl_api.LoginData
@@ -1912,29 +2135,34 @@ var file_ebl_api_proto_depIdxs = []int32{
 	1,  // 4: ebl_api.GetUserInfoData.user_type:type_name -> ebl_api.UserType
 	0,  // 5: ebl_api.GetUserInfoData.company_type:type_name -> ebl_api.CompanyType
 	13, // 6: ebl_api.GetCompanyAllListResp.data:type_name -> ebl_api.GetCompanyAllListData
-	20, // 7: ebl_api.GetCompanyAllListData.company_list:type_name -> ebl_api.Company
-	21, // 8: ebl_api.CreateEblReq.ebl:type_name -> ebl_api.Ebl
+	23, // 7: ebl_api.GetCompanyAllListData.company_list:type_name -> ebl_api.Company
+	24, // 8: ebl_api.CreateEblReq.ebl:type_name -> ebl_api.Ebl
 	16, // 9: ebl_api.CreateEblResp.data:type_name -> ebl_api.CreateEblData
 	19, // 10: ebl_api.QueryAllEblListResp.data:type_name -> ebl_api.QueryAllEblListData
-	21, // 11: ebl_api.QueryAllEblListData.ebl_list:type_name -> ebl_api.Ebl
-	0,  // 12: ebl_api.Company.company_type:type_name -> ebl_api.CompanyType
-	2,  // 13: ebl_api.EblApi.Login:input_type -> ebl_api.LoginReq
-	5,  // 14: ebl_api.EblApi.CreateCompany:input_type -> ebl_api.CreateCompanyReq
-	8,  // 15: ebl_api.EblApi.GetUserInfo:input_type -> ebl_api.GetUserInfoReq
-	11, // 16: ebl_api.EblApi.GetCompanyAllList:input_type -> ebl_api.GetCompanyAllListReq
-	14, // 17: ebl_api.EblApi.CreateEbl:input_type -> ebl_api.CreateEblReq
-	17, // 18: ebl_api.EblApi.QueryAllEblList:input_type -> ebl_api.QueryAllEblListReq
-	3,  // 19: ebl_api.EblApi.Login:output_type -> ebl_api.LoginResp
-	6,  // 20: ebl_api.EblApi.CreateCompany:output_type -> ebl_api.CreateCompanyResp
-	9,  // 21: ebl_api.EblApi.GetUserInfo:output_type -> ebl_api.GetUserInfoResp
-	12, // 22: ebl_api.EblApi.GetCompanyAllList:output_type -> ebl_api.GetCompanyAllListResp
-	15, // 23: ebl_api.EblApi.CreateEbl:output_type -> ebl_api.CreateEblResp
-	18, // 24: ebl_api.EblApi.QueryAllEblList:output_type -> ebl_api.QueryAllEblListResp
-	19, // [19:25] is the sub-list for method output_type
-	13, // [13:19] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	24, // 11: ebl_api.QueryAllEblListData.ebl_list:type_name -> ebl_api.Ebl
+	24, // 12: ebl_api.QueryEblListReq.ebl:type_name -> ebl_api.Ebl
+	22, // 13: ebl_api.QueryEblListResp.data:type_name -> ebl_api.QueryEblListData
+	24, // 14: ebl_api.QueryEblListData.ebl_list:type_name -> ebl_api.Ebl
+	0,  // 15: ebl_api.Company.company_type:type_name -> ebl_api.CompanyType
+	2,  // 16: ebl_api.EblApi.Login:input_type -> ebl_api.LoginReq
+	5,  // 17: ebl_api.EblApi.CreateCompany:input_type -> ebl_api.CreateCompanyReq
+	8,  // 18: ebl_api.EblApi.GetUserInfo:input_type -> ebl_api.GetUserInfoReq
+	11, // 19: ebl_api.EblApi.GetCompanyAllList:input_type -> ebl_api.GetCompanyAllListReq
+	14, // 20: ebl_api.EblApi.CreateEbl:input_type -> ebl_api.CreateEblReq
+	17, // 21: ebl_api.EblApi.QueryAllEblList:input_type -> ebl_api.QueryAllEblListReq
+	20, // 22: ebl_api.EblApi.QueryEblList:input_type -> ebl_api.QueryEblListReq
+	3,  // 23: ebl_api.EblApi.Login:output_type -> ebl_api.LoginResp
+	6,  // 24: ebl_api.EblApi.CreateCompany:output_type -> ebl_api.CreateCompanyResp
+	9,  // 25: ebl_api.EblApi.GetUserInfo:output_type -> ebl_api.GetUserInfoResp
+	12, // 26: ebl_api.EblApi.GetCompanyAllList:output_type -> ebl_api.GetCompanyAllListResp
+	15, // 27: ebl_api.EblApi.CreateEbl:output_type -> ebl_api.CreateEblResp
+	18, // 28: ebl_api.EblApi.QueryAllEblList:output_type -> ebl_api.QueryAllEblListResp
+	21, // 29: ebl_api.EblApi.QueryEblList:output_type -> ebl_api.QueryEblListResp
+	23, // [23:30] is the sub-list for method output_type
+	16, // [16:23] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_ebl_api_proto_init() }
@@ -2160,7 +2388,7 @@ func file_ebl_api_proto_init() {
 			}
 		}
 		file_ebl_api_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Company); i {
+			switch v := v.(*QueryEblListReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2172,6 +2400,42 @@ func file_ebl_api_proto_init() {
 			}
 		}
 		file_ebl_api_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryEblListResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryEblListData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Company); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Ebl); i {
 			case 0:
 				return &v.state
@@ -2190,7 +2454,7 @@ func file_ebl_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ebl_api_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   20,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

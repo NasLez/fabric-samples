@@ -32,6 +32,7 @@ type FabricEblService interface {
 	GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error)
 	CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error)
 	QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error)
+	QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error)
 }
 
 type Param struct {
@@ -41,6 +42,233 @@ type Param struct {
 
 type FabricEblServiceImpl struct {
 	p Param
+}
+
+func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
+	token := req.Token
+	claims, err := jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, biz_error.ParseTokenError
+	}
+	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return nil, err
+	}
+	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return nil, err
+	}
+	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	if err != nil {
+		log.Fatalf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	}
+	walletName := company.Name + "_" + user.Name
+	wallet, err := gateway.NewFileSystemWallet("wallet")
+	if err != nil {
+		log.Fatalf("Failed to create wallet: %v", err)
+	}
+	if !wallet.Exists(walletName) {
+		err = addUserToWallet(wallet, walletName)
+		if err != nil {
+			log.Fatalf("Failed to populate wallet contents: %v", err)
+		}
+	}
+	ccpPath := filepath.Join(
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"connection-org1.yaml",
+	)
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, walletName),
+	)
+	if err != nil {
+		log.Fatalf("Failed to connect to gateway: %v", err)
+	}
+	defer gw.Close()
+	network, err := gw.GetNetwork("mychannel")
+	if err != nil {
+		log.Fatalf("Failed to get network: %v", err)
+	}
+	contract := network.GetContract("basic")
+	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
+
+	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
+	//selector:="{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	types := 0
+	selector := "{\"selector\":{"
+	if req.EblFilter.EblNo != "" {
+		selector += "\"eblNo\":\"" + req.EblFilter.EblNo + "\""
+		types++
+	}
+	if req.EblFilter.OriginCompanyID != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"originCompanyID\":\"" + req.EblFilter.OriginCompanyID + "\""
+	}
+	if req.EblFilter.ShipperCompanyID != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"shipperCompanyID\":\"" + req.EblFilter.ShipperCompanyID + "\""
+	}
+	if req.EblFilter.ConsigneeCompanyID != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"consigneeCompanyID\":\"" + req.EblFilter.ConsigneeCompanyID + "\""
+	}
+	if req.EblFilter.NotifyPartyCompanyID != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"notifyPartyCompanyID\":\"" + req.EblFilter.NotifyPartyCompanyID + "\""
+	}
+	if req.EblFilter.PortOfDescharge != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"portOfDescharge\":\"" + req.EblFilter.PortOfDescharge + "\""
+	}
+	if req.EblFilter.Status != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"status\":\"" + req.EblFilter.Status + "\""
+	}
+	if req.EblFilter.CompanyID != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"companyID\":" + strconv.FormatInt(req.EblFilter.CompanyID, 10)
+	}
+	if req.EblFilter.TransferCompanyID != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"transferCompanyID\":\"" + req.EblFilter.TransferCompanyID + "\""
+	}
+	if req.EblFilter.DateOfIssue != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"dateOfIssue\":" + strconv.FormatInt(req.EblFilter.DateOfIssue, 10)
+	}
+	if req.EblFilter.ShippedOnBoard != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"shippedOnBoard\":" + strconv.FormatInt(req.EblFilter.ShippedOnBoard, 10)
+	}
+	if req.EblFilter.DateOfIssueDeadline != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"dateOfIssueDeadline\":" + strconv.FormatInt(req.EblFilter.DateOfIssueDeadline, 10)
+	}
+	if req.EblFilter.QuantityOfPackages != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"quantityOfPackages\":" + strconv.FormatFloat(req.EblFilter.QuantityOfPackages, 'f', -1, 64)
+	}
+	if req.EblFilter.GrossWeight != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"grossWeight\":" + strconv.FormatFloat(req.EblFilter.GrossWeight, 'f', -1, 64)
+	}
+	if req.EblFilter.Measurement != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"measurement\":" + strconv.FormatFloat(req.EblFilter.Measurement, 'f', -1, 64)
+	}
+	if req.EblFilter.NumOfEBL != 0 {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"numOfEBL\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
+	}
+	if req.EblFilter.PlaceOfDelivery != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"placeOfDelivery\":\"" + req.EblFilter.PlaceOfDelivery + "\""
+	}
+	if req.EblFilter.PlaceOfDestination != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"placeOfDestination\":\"" + req.EblFilter.PlaceOfDestination + "\""
+	}
+	if req.EblFilter.PlaceOfIssue != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"placeOfIssue\":\"" + req.EblFilter.PlaceOfIssue + "\""
+	}
+	if req.EblFilter.PlaceOfReceipt != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"placeOfReceipt\":\"" + req.EblFilter.PlaceOfReceipt + "\""
+	}
+	if req.EblFilter.PortOfLoading != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"portOfLoading\":\"" + req.EblFilter.PortOfLoading + "\""
+	}
+	if req.EblFilter.ShippingMarkes != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"shippingMarkes\":\"" + req.EblFilter.ShippingMarkes + "\""
+	}
+	if req.EblFilter.FreightAndCharges != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"freightAndCharges\":\"" + req.EblFilter.FreightAndCharges + "\""
+
+	}
+	if req.EblFilter.DescriptionOfGoods != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"descriptionOfGoods\":\"" + req.EblFilter.DescriptionOfGoods + "\""
+	}
+	if req.EblFilter.DeliveryAgent != "" {
+		if types > 0 {
+			selector += ","
+		}
+		selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
+	}
+	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
+	if err != nil {
+		log.Fatalf("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+	resp, err := GetEblByRangeWithPaginationResp2DO(result)
+	if err != nil {
+		log.Fatalf("Failed to convert result: %v", err)
+	}
+	return &fabric_ebl.QueryEblListResp{
+		EblList:             resp.EblList,
+		Bookmark:            resp.Bookmark,
+		FetchedRecordsCount: resp.FetchedRecordsCount,
+	}, nil
 }
 
 func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error) {
@@ -316,36 +544,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		req.Ebl.TransferCompanyID,                // transferCompanyID
-		req.Ebl.TransferCompanyName,              // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		req.Ebl.TransferCompanyID,                                    // transferCompanyID
+		req.Ebl.TransferCompanyName,                                  // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement

@@ -63,3 +63,12 @@ func QueryAllEblList(ctx context.Context, rpc *fabric_ebl.QueryAllEblListReq) (r
 	}
 	return resp, nil
 }
+
+func QueryEblList(ctx context.Context, rpc *fabric_ebl.QueryEblListReq) (resp *fabric_ebl.QueryEblListResp, err error) {
+	resp, err = client.QueryEblList(ctx, rpc)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryEblList error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}

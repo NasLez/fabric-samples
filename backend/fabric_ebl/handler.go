@@ -16,6 +16,10 @@ type Handler struct {
 	p Param
 }
 
+func (s *Handler) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (r *fabric_ebl.QueryEblListResp, err error) {
+	return s.p.FabricEblService.QueryEblList(ctx, req)
+}
+
 func (s *Handler) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (r *fabric_ebl.QueryAllEblListResp, err error) {
 	return s.p.FabricEblService.QueryAllEblList(ctx, req)
 }
