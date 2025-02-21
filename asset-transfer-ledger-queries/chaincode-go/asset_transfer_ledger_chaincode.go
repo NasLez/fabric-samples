@@ -410,8 +410,14 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 	var assets []*Asset
 	for resultsIterator.HasNext() {
 		queryResult, err := resultsIterator.Next()
+
 		if err != nil {
 			return nil, err
+		}
+
+		fmt.Println("Query Result:", string(queryResult.Value)) // 打印返回的原始值
+		if len(queryResult.Value) == 0 {
+			return nil, fmt.Errorf("empty value found for asset ID: %s", queryResult.Key)
 		}
 		var asset Asset
 		err = json.Unmarshal(queryResult.Value, &asset)
@@ -605,7 +611,9 @@ func getEblQueryResultForQueryStringWithPagination(ctx contractapi.TransactionCo
 	if err != nil {
 		return nil, err
 	}
-
+	if ebls == nil {
+		return nil, fmt.Errorf("No EBLs found")
+	}
 	return &EblPaginatedQueryResult{
 		Records:             ebls,
 		FetchedRecordsCount: responseMetadata.FetchedRecordsCount,
