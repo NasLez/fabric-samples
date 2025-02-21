@@ -538,7 +538,7 @@ func (t *SimpleChaincode) QueryAssetsWithPagination(ctx contractapi.TransactionC
 }
 
 func (t *SimpleChaincode) QueryEblWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int, bookmark string) (*PaginatedQueryResult, error) {
-	return getQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
+	return getEblQueryResultForQueryStringWithPagination(ctx, queryString, int32(pageSize), bookmark)
 }
 
 // getQueryResultForQueryStringWithPagination executes the passed in query string with
@@ -558,6 +558,25 @@ func getQueryResultForQueryStringWithPagination(ctx contractapi.TransactionConte
 
 	return &PaginatedQueryResult{
 		Records:             assets,
+		FetchedRecordsCount: responseMetadata.FetchedRecordsCount,
+		Bookmark:            responseMetadata.Bookmark,
+	}, nil
+}
+
+func getEblQueryResultForQueryStringWithPagination(ctx contractapi.TransactionContextInterface, queryString string, pageSize int32, bookmark string) (*PaginatedQueryResult, error) {
+	resultsIterator, responseMetadata, err := ctx.GetStub().GetQueryResultWithPagination(queryString, pageSize, bookmark)
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	ebls, err := constructQueryResponseFromIterator(resultsIterator)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PaginatedQueryResult{
+		Records:             ebls,
 		FetchedRecordsCount: responseMetadata.FetchedRecordsCount,
 		Bookmark:            responseMetadata.Bookmark,
 	}, nil
