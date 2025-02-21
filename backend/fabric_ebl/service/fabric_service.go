@@ -254,8 +254,8 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		}
 		selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
 	}
-	log.Println(selector)
 	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	log.Println(selector)
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
 	if err != nil {
 		log.Fatalf("Failed to Submit transaction: %v", err)
