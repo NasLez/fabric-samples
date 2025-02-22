@@ -29,7 +29,7 @@ type FabricIpfsServiceImpl struct {
 }
 
 func (f FabricIpfsServiceImpl) CreateEblDocx(ctx context.Context, req *fabric_ipfs.CreateEblDocxReq) (*fabric_ipfs.CreateEblDocxResp, error) {
-	r, err := docx.ReadDocxFile("./ebl_template.docx")
+	r, err := docx.ReadDocxFile("./docx/ebl_template.docx")
 	// 或者从内存中读取
 	// r, err := docx.ReadDocxFromMemory(data io.ReaderAt, size int64)
 
