@@ -181,12 +181,12 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 		gateway.WithIdentity(wallet, walletName),
 	)
 	if err != nil {
-		log.Println("Failed to connect to gateway: %v", err)
+		log.Printf("Failed to connect to gateway: %v\n", err)
 	}
 	defer gw.Close()
 	network, err := gw.GetNetwork("mychannel")
 	if err != nil {
-		log.Println("Failed to get network: %v", err)
+		log.Printf("Failed to get network: %v\n", err)
 	}
 	contract := network.GetContract("basic")
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
@@ -194,12 +194,17 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
 	result, err := contract.SubmitTransaction("GetEblByRangeWithPagination", "", "", contractPageSize, *req.Bookmark)
 	if err != nil {
-		log.Println("Failed to Submit transaction: %v", err)
+		log.Printf("Failed to Submit transaction: %v\n", err)
+		return &fabric_ebl.QueryAllEblListResp{
+			EblList:             []*fabric_ebl.Ebl{},
+			Bookmark:            "",
+			FetchedRecordsCount: 0,
+		}, nil
 	}
 	log.Println(string(result))
 	resp, err := GetEblByRangeWithPaginationResp2DO(result)
 	if err != nil {
-		log.Println("Failed to convert result: %v", err)
+		log.Printf("Failed to convert result: %v\n", err)
 	}
 	return resp, nil
 }
