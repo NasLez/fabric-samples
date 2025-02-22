@@ -65,8 +65,8 @@ func (f FabricIpfsServiceImpl) CreateEblDocx(ctx context.Context, req *fabric_ip
 	docx1.Replace("shippedOnBoard", strconv.FormatInt(req.Ebl.ShippedOnBoard, 10), -1)
 	docx1.Replace("numOfEbl", strconv.FormatInt(req.Ebl.NumOfEBL, 10), -1)
 	docx1.Replace("dateOfIssueDeadline", strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10), -1)
-	docx1.WriteToFile("../docx/" + req.Ebl.EblNo + ".docx")
-	raw := Read("../docx/" + req.Ebl.EblNo + ".docx")
+	docx1.WriteToFile("./docx/" + req.Ebl.EblNo + ".docx")
+	raw := Read("./docx/" + req.Ebl.EblNo + ".docx")
 	resp := fabric_ipfs.CreateEblDocxResp{}
 	if raw != nil {
 		hash, err := UploadIPFS(raw)
@@ -75,6 +75,8 @@ func (f FabricIpfsServiceImpl) CreateEblDocx(ctx context.Context, req *fabric_ip
 		}
 		log.Println("hash", hash)
 		resp.FileHash = hash
+	} else {
+		log.Println("read file fail")
 	}
 	//delete file
 	err = os.Remove("../docx/" + req.Ebl.EblNo + ".docx")
