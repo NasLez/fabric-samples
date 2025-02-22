@@ -79,11 +79,11 @@ func (f FabricIpfsServiceImpl) CreateEblDocx(ctx context.Context, req *fabric_ip
 		log.Println("read file fail")
 	}
 	//delete file
-	//err = os.Remove("./docx/" + req.Ebl.EblNo + ".docx")
-	//if err != nil {
-	//	log.Println("delete file fail", err)
-	//	return nil, err
-	//}
+	err = os.Remove("./docx/" + req.Ebl.EblNo + ".docx")
+	if err != nil {
+		log.Println("delete file fail", err)
+		return nil, err
+	}
 	return &resp, nil
 }
 
