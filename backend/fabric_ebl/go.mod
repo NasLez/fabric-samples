@@ -9,7 +9,6 @@ require (
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/kitex-contrib/registry-nacos v0.1.2
 	github.com/nacos-group/nacos-sdk-go v1.1.5
-	github.com/nguyenthenguyen/docx v0.0.0-20230621112118-9c8e795a11db
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/viper v1.19.0
 	github.com/wxl-server/common v0.0.0-20250124091328-b8c8589e8ad3
