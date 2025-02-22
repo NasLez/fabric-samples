@@ -20,6 +20,8 @@ var (
 	CreateCompanyError2  = newBizError(1008, "create company failed, user email has been used")
 	CreateCompanyError3  = newBizError(1009, "create company failed, user email is not exist")
 	ParseTokenError      = newBizError(1010, "parse token failed")
+	CompanyIDNotMatch    = newBizError(1011, "company id not match")
+	StatusNotMatch       = newBizError(1012, "status not match")
 )
 
 func newBizError(code int64, message string) *BizError {

@@ -65,3 +65,8 @@ func _queryebllistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _submiteblMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

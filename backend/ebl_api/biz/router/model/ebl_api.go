@@ -27,6 +27,7 @@ func Register(r *server.Hertz) {
 		_ebl.POST("/all", append(_queryallebllistMw(), model.QueryAllEblList)...)
 		_ebl.POST("/create", append(_createeblMw(), model.CreateEbl)...)
 		_ebl.POST("/query", append(_queryebllistMw(), model.QueryEblList)...)
+		_ebl.POST("/submit", append(_submiteblMw(), model.SubmitEbl)...)
 	}
 	{
 		_user := root.Group("/user", _userMw()...)

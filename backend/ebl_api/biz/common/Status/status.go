@@ -52,4 +52,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("query ebl list error"),
 	}
+	SubmitEblError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("submit ebl error"),
+	}
 )

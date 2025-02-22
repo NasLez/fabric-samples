@@ -12,7 +12,7 @@ require (
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/viper v1.19.0
 	github.com/wxl-server/common v0.0.0-20250124091328-b8c8589e8ad3
-	github.com/wxl-server/idl_gen v0.0.0-20250222032116-304bcff254c0
+	github.com/wxl-server/idl_gen v0.0.0-20250222064735-6064ee02c2f3
 	go.uber.org/dig v1.18.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gen v0.3.26

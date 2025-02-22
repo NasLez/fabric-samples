@@ -255,7 +255,7 @@ func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface,
 		ShippedOnBoard:         shippedOnBoard,
 		NumOfEBL:               numOfEBL,
 		DateOfIssueDeadline:    dateOfIssueDeadline,
-		Status:                 status,
+		Status:                 "Created",
 		File:                   file,
 		ContractFiles:          contractFiles,
 		InvoiceFiles:           invoiceFiles,
@@ -294,6 +294,24 @@ func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface,
 	// Optionally, create other indexes based on different fields (e.g. status, companyID, etc.)
 
 	return nil
+}
+
+func (t *SimpleChaincode) SubmitEbl(ctx contractapi.TransactionContextInterface, eblNo string) error {
+	ebl, err := t.ReadEbl(ctx, eblNo)
+	if err != nil {
+		return err
+	}
+
+	// Update the EBL status to "Submitted"
+	ebl.Status = "Submitted"
+
+	// Marshal the EBL struct into JSON bytes
+	eblBytes, err := json.Marshal(ebl)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(eblNo, eblBytes)
 }
 
 // ReadAsset retrieves an asset from the ledger
