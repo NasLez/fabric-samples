@@ -22,3 +22,5 @@ package-lock.json
 /backend/fabric_ebl/log/
 /backend/ebl_api/log/
 /backend/fabric_ipfs/log/
+/backend/fabric_ebl/cache/
+/backend/fabric_ipfs/cache/
