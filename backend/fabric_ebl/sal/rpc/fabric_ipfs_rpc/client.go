@@ -5,8 +5,8 @@ import (
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ipfs"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ipfs/fabricipfs"
 
+	"fabric_ebl/common/wxl_cluster"
 	"github.com/bytedance/gopkg/util/logger"
-	"github.com/wxl-server/common/wxl_cluster"
 )
 
 var client = wxl_cluster.NewClient(fabricipfs.NewClient, "fabric_ipfs")

@@ -294,9 +294,6 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		log.Println("Failed to get network: %v", err)
 	}
 	contract := network.GetContract("basic")
-	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
-	ID, err := id_gen.NextID()
-	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	{
 		resp, err := fabric_ipfs_rpc.CreateEblDocx(ctx, reqHttp2Rpc(req))
 		if err != nil {
@@ -306,6 +303,9 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		logger.Infof("CreateEblDocx success, resp = %v", resp.FileHash)
 		req.Ebl.File = resp.FileHash
 	}
+	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
+	ID, err := id_gen.NextID()
+	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	result, err := contract.SubmitTransaction(
 		"CreateEbl",                              // chaincode method
 		req.Ebl.EblNo,                            // eblNo
