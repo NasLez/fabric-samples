@@ -262,10 +262,6 @@ github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/wxl-server/common v0.0.0-20250123083438-70335090ef17 h1:WbB8viQ8hwlwJWlt/7KXZAMaSptnsJZbdve6iZ3UINs=
 github.com/wxl-server/common v0.0.0-20250123083438-70335090ef17/go.mod h1:ttXl7msyGGdllN5iMbIwgQsQbEounzZqLFXBhPuokM8=
-github.com/wxl-server/idl_gen v0.0.0-20250221080728-7516837af61a h1:6Xm2LrBdhnNsuWrYzGvKQeJSJtdIsZ2O8wv5bJK+wGo=
-github.com/wxl-server/idl_gen v0.0.0-20250221080728-7516837af61a/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
-github.com/wxl-server/idl_gen v0.0.0-20250222064005-87b18f06fcf4 h1:pZ/bZ1CPLgiXYcE6Sb6nA4augb5dXdQ57UPRyBBPQYg=
-github.com/wxl-server/idl_gen v0.0.0-20250222064005-87b18f06fcf4/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/wxl-server/idl_gen v0.0.0-20250222064735-6064ee02c2f3 h1:qmmxuiOrcWkiWdmOPnMYXywv2nFaqopUAsrzZwumdGs=
 github.com/wxl-server/idl_gen v0.0.0-20250222064735-6064ee02c2f3/go.mod h1:dNv/KtsF0QHfyrDBlSizUBFI5RmrsFoTquLzbJdIdN0=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
