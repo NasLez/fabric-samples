@@ -802,7 +802,7 @@ var eblOperationMap = map[fabric_ebl.OperationType]wxl{
 		FabricTransaction: "RejectEbl",
 	},
 	fabric_ebl.OperationType_Retreat: {
-		Status:            "Approved",
+		Status:            "Submitted",
 		FabricTransaction: "RetreatEbl",
 	},
 }
