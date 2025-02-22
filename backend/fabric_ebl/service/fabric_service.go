@@ -10,13 +10,11 @@ import (
 	"fabric_ebl/sal/jwt"
 	"fabric_ebl/sal/rpc/fabric_ipfs_rpc"
 	"fmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ipfs"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -66,43 +64,46 @@ func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.Op
 		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 		return nil, err
 	}
-	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Printf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v\n", err)
-	}
-	walletName := company.Name + "_" + user.Name
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Printf("Failed to create wallet: %v\n", err)
-	}
-	if !wallet.Exists(walletName) {
-		err = addUserToWallet(wallet, walletName)
-		if err != nil {
-			log.Println("Failed to populate wallet contents: %v", err)
-		}
-	}
-	ccpPath := filepath.Join(
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
-		"connection-org1.yaml",
-	)
-	gw, err := gateway.Connect(
-		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, walletName),
-	)
-	if err != nil {
-		log.Printf("Failed to connect to gateway: %v\n", err)
-	}
-	defer gw.Close()
-	network, err := gw.GetNetwork("mychannel")
-	if err != nil {
-		log.Printf("Failed to get network: %v\n", err)
-	}
-	contract := network.GetContract("basic")
+	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//if err != nil {
+	//	log.Printf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v\n", err)
+	//}
+	//walletName := company.Name + "_" + user.Name
+	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//if err != nil {
+	//	log.Printf("Failed to create wallet: %v\n", err)
+	//}
+	//if !wallet.Exists(walletName) {
+	//	err = addUserToWallet(wallet, walletName)
+	//	if err != nil {
+	//		log.Println("Failed to populate wallet contents: %v", err)
+	//	}
+	//}
+	//ccpPath := filepath.Join(
+	//	"..",
+	//	"..",
+	//	"test-network",
+	//	"organizations",
+	//	"peerOrganizations",
+	//	"org1.example.com",
+	//	"connection-org1.yaml",
+	//)
+	//gw, err := gateway.Connect(
+	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+	//	gateway.WithIdentity(wallet, walletName),
+	//)
+	//if err != nil {
+	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//}
+	//defer gw.Close()
+	//network, err := gw.GetNetwork("mychannel")
+	//if err != nil {
+	//	log.Printf("Failed to get network: %v\n", err)
+	//}
+	//contract := network.GetContract("basic")
+
+	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	defer gwc()
 	log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
 	result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
 	if err != nil {
@@ -163,43 +164,46 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 		return nil, err
 	}
-	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	}
-	walletName := company.Name + "_" + user.Name
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Println("Failed to create wallet: %v", err)
-	}
-	if !wallet.Exists(walletName) {
-		err = addUserToWallet(wallet, walletName)
-		if err != nil {
-			log.Println("Failed to populate wallet contents: %v", err)
-		}
-	}
-	ccpPath := filepath.Join(
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
-		"connection-org1.yaml",
-	)
-	gw, err := gateway.Connect(
-		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, walletName),
-	)
-	if err != nil {
-		log.Printf("Failed to connect to gateway: %v\n", err)
-	}
-	defer gw.Close()
-	network, err := gw.GetNetwork("mychannel")
-	if err != nil {
-		log.Printf("Failed to get network: %v\n", err)
-	}
-	contract := network.GetContract("basic")
+	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//if err != nil {
+	//	log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	//}
+	//walletName := company.Name + "_" + user.Name
+	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//if err != nil {
+	//	log.Println("Failed to create wallet: %v", err)
+	//}
+	//if !wallet.Exists(walletName) {
+	//	err = addUserToWallet(wallet, walletName)
+	//	if err != nil {
+	//		log.Println("Failed to populate wallet contents: %v", err)
+	//	}
+	//}
+	//ccpPath := filepath.Join(
+	//	"..",
+	//	"..",
+	//	"test-network",
+	//	"organizations",
+	//	"peerOrganizations",
+	//	"org1.example.com",
+	//	"connection-org1.yaml",
+	//)
+	//gw, err := gateway.Connect(
+	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+	//	gateway.WithIdentity(wallet, walletName),
+	//)
+	//if err != nil {
+	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//}
+	//defer gw.Close()
+	//network, err := gw.GetNetwork("mychannel")
+	//if err != nil {
+	//	log.Printf("Failed to get network: %v\n", err)
+	//}
+	//contract := network.GetContract("basic")
+
+	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	defer gwc()
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
 
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
@@ -245,43 +249,46 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 		return nil, err
 	}
-	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	}
-	walletName := company.Name + "_" + user.Name
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Println("Failed to create wallet: %v", err)
-	}
-	if !wallet.Exists(walletName) {
-		err = addUserToWallet(wallet, walletName)
-		if err != nil {
-			log.Println("Failed to populate wallet contents: %v", err)
-		}
-	}
-	ccpPath := filepath.Join(
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
-		"connection-org1.yaml",
-	)
-	gw, err := gateway.Connect(
-		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, walletName),
-	)
-	if err != nil {
-		log.Printf("Failed to connect to gateway: %v\n", err)
-	}
-	defer gw.Close()
-	network, err := gw.GetNetwork("mychannel")
-	if err != nil {
-		log.Printf("Failed to get network: %v\n", err)
-	}
-	contract := network.GetContract("basic")
+	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//if err != nil {
+	//	log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	//}
+	//walletName := company.Name + "_" + user.Name
+	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//if err != nil {
+	//	log.Println("Failed to create wallet: %v", err)
+	//}
+	//if !wallet.Exists(walletName) {
+	//	err = addUserToWallet(wallet, walletName)
+	//	if err != nil {
+	//		log.Println("Failed to populate wallet contents: %v", err)
+	//	}
+	//}
+	//ccpPath := filepath.Join(
+	//	"..",
+	//	"..",
+	//	"test-network",
+	//	"organizations",
+	//	"peerOrganizations",
+	//	"org1.example.com",
+	//	"connection-org1.yaml",
+	//)
+	//gw, err := gateway.Connect(
+	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+	//	gateway.WithIdentity(wallet, walletName),
+	//)
+	//if err != nil {
+	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//}
+	//defer gw.Close()
+	//network, err := gw.GetNetwork("mychannel")
+	//if err != nil {
+	//	log.Printf("Failed to get network: %v\n", err)
+	//}
+	//contract := network.GetContract("basic")
+
+	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	defer gwc()
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
 
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
@@ -358,44 +365,6 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		}
 		req.Ebl.NotifyPartyCompanyName = notifyPartyCompany.Name
 	}
-
-	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	//if err != nil {
-	//	log.Printf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v\n", err)
-	//}
-	//walletName := company.Name + "_" + user.Name
-	//wallet, err := gateway.NewFileSystemWallet("wallet")
-	//if err != nil {
-	//	log.Printf("Failed to create wallet: %v\n", err)
-	//}
-	//if !wallet.Exists(walletName) {
-	//	err = addUserToWallet(wallet, walletName)
-	//	if err != nil {
-	//		log.Printf("Failed to populate wallet contents: %v\n", err)
-	//	}
-	//}
-	//ccpPath := filepath.Join(
-	//	"..",
-	//	"..",
-	//	"test-network",
-	//	"organizations",
-	//	"peerOrganizations",
-	//	"org1.example.com",
-	//	"connection-org1.yaml",
-	//)
-	//gw, err := gateway.Connect(
-	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-	//	gateway.WithIdentity(wallet, walletName),
-	//)
-	//if err != nil {
-	//	log.Println("Failed to connect to gateway: %v", err)
-	//}
-	//defer gw.Close()
-	//network, err := gw.GetNetwork("mychannel")
-	//if err != nil {
-	//	log.Println("Failed to get network: %v", err)
-	//}
-	//contract := network.GetContract("basic")
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
 	ID, err := id_gen.NextID()
@@ -411,36 +380,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	}
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		"",                                       // transferCompanyID
-		"",                                       // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		"",                                                           // transferCompanyID
+		"",                                                           // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
