@@ -128,7 +128,7 @@ type Ebl struct {
 	NumOfEBL               int64   `json:"numOfEbl"`
 	DateOfIssueDeadline    int64   `json:"dateOfIssueDeadline"`
 	Status                 string  `json:"status"`
-	File                   string  `json:"fileHash"`
+	File                   string  `json:"file"`
 	ContractFiles          string  `json:"contractFiles"`
 	InvoiceFiles           string  `json:"invoiceFiles"`
 	TransferCompanyID      string  `json:"transferCompanyID"`
