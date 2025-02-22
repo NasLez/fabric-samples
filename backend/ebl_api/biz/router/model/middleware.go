@@ -70,3 +70,8 @@ func _submiteblMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _operateeblMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

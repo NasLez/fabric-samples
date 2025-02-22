@@ -11,7 +11,7 @@ require (
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/viper v1.19.0
 	github.com/wxl-server/common v0.0.0-20250123083438-70335090ef17
-	github.com/wxl-server/idl_gen v0.0.0-20250222064735-6064ee02c2f3
+	github.com/wxl-server/idl_gen v0.0.0-20250222074219-aaf1d0cd62d0
 	google.golang.org/protobuf v1.36.3
 )
 

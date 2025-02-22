@@ -35,7 +35,7 @@ type FabricEblService interface {
 	CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error)
 	QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error)
 	QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error)
-	SubmitEbl(ctx context.Context, req *fabric_ebl.SubmitEblReq) (*fabric_ebl.SubmitEblResp, error)
+	OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error)
 }
 
 type Param struct {
@@ -47,7 +47,7 @@ type FabricEblServiceImpl struct {
 	p Param
 }
 
-func (u FabricEblServiceImpl) SubmitEbl(ctx context.Context, req *fabric_ebl.SubmitEblReq) (*fabric_ebl.SubmitEblResp, error) {
+func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
 	token := req.Token
 	claims, err := jwt.ValidateToken(ctx, token)
 	if err != nil {
@@ -114,24 +114,26 @@ func (u FabricEblServiceImpl) SubmitEbl(ctx context.Context, req *fabric_ebl.Sub
 		log.Printf("Failed to unmarshal result: %v\n", err)
 		return nil, err
 	}
-	companyID := strconv.FormatInt(company.ID, 10)
-	if ebl.OriginCompanyID != companyID {
+	if ebl.CompanyID != company.ID {
 		log.Println("CompanyID not match")
 		return nil, biz_error.CompanyIDNotMatch
 	}
-	if ebl.Status != "Created" {
-		log.Println("Status not match")
-		return nil, biz_error.StatusNotMatch
+	{
+		w := eblOperationMap[req.Type]
+		if ebl.Status != w.Status {
+			log.Println("Status not match")
+			return nil, biz_error.StatusNotMatch
+		}
+		log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details")
+		result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", ebl.CompanyName)
+		if err != nil {
+			log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
+			return &fabric_ebl.OperateEblResp{
+				Id: 0,
+			}, nil
+		}
 	}
-	log.Println("--> Submit Transaction: SubmitEbl, submit EBL with provided details")
-	result, err = contract.SubmitTransaction("SubmitEbl", req.EblNo)
-	if err != nil {
-		log.Printf("Failed to Submit transaction: SubmitEbl%v\n", err)
-		return &fabric_ebl.SubmitEblResp{
-			Id: 0,
-		}, nil
-	}
-	return &fabric_ebl.SubmitEblResp{
+	return &fabric_ebl.OperateEblResp{
 		Id: 1,
 	}, nil
 }
@@ -994,4 +996,27 @@ type GetEblByRangeWithPaginationResp struct {
 	Records             []*Ebl `thrift:"records,1,required" frugal:"1,required" json:"records"`
 	FetchedRecordsCount int64  `thrift:"fetchedRecordsCount,2,required" frugal:"2,required,string" json:"fetchedRecordsCount"`
 	Bookmark            string `thrift:"bookmark,3,required" frugal:"3,required,string" json:"bookmark"`
+}
+type wxl struct {
+	Status            string `json:"status"`
+	FabricTransaction string `json:"fabricTransaction"`
+}
+
+var eblOperationMap = map[fabric_ebl.OperationType]wxl{
+	fabric_ebl.OperationType_Submit: {
+		Status:            "Created",
+		FabricTransaction: "SubmitEbl",
+	},
+	fabric_ebl.OperationType_Approve: {
+		Status:            "Submitted",
+		FabricTransaction: "ApproveEbl",
+	},
+	fabric_ebl.OperationType_Reject: {
+		Status:            "Submitted",
+		FabricTransaction: "RejectEbl",
+	},
+	fabric_ebl.OperationType_Retreat: {
+		Status:            "Approved",
+		FabricTransaction: "RetreatEbl",
+	},
 }

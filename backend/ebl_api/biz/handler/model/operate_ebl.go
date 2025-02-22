@@ -12,29 +12,29 @@ import (
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
 )
 
-// SubmitEbl .
-// @router /user/SubmitEbl [GET]
-func SubmitEbl(ctx context.Context, c *app.RequestContext) {
-	NewSubmitEblHandler(ctx, c).handle()
+// OperateEbl .
+// @router /user/OperateEbl [GET]
+func OperateEbl(ctx context.Context, c *app.RequestContext) {
+	NewOperateEblHandler(ctx, c).handle()
 }
 
-type SubmitEblHandler struct {
+type OperateEblHandler struct {
 	ctx      context.Context
 	hertzCtx *app.RequestContext
-	respData *model.SubmitEblData
+	respData *model.OperateEblData
 }
 
-func NewSubmitEblHandler(ctx context.Context, hertzCtx *app.RequestContext) *SubmitEblHandler {
-	return &SubmitEblHandler{
+func NewOperateEblHandler(ctx context.Context, hertzCtx *app.RequestContext) *OperateEblHandler {
+	return &OperateEblHandler{
 		ctx:      ctx,
 		hertzCtx: hertzCtx,
 	}
 }
 
-func (h *SubmitEblHandler) handle() {
+func (h *OperateEblHandler) handle() {
 	// 业务逻辑
 	ctx := h.ctx
-	var req model.SubmitEblReq
+	var req model.OperateEblReq
 	err := h.hertzCtx.BindAndValidate(&req)
 	if err != nil {
 		h.hertzCtx.String(consts.StatusBadRequest, err.Error())
@@ -42,32 +42,32 @@ func (h *SubmitEblHandler) handle() {
 	}
 	header := h.hertzCtx.Request.Header
 	token := header.Get("token")
-	resp, err := fabric_ebl_rpc.SubmitEbl(ctx, h.reqHttp2Rpc(&req, token))
+	resp, err := fabric_ebl_rpc.OperateEbl(ctx, h.reqHttp2Rpc(&req, token))
 	if err != nil {
-		h.ReturnResp(Status.SubmitEblError, err)
+		h.ReturnResp(Status.OperateEblError, err)
 		return
 	}
 	h.respData = h.respRpc2Http(resp)
 	h.ReturnResp(Status.Success, nil)
 
 }
-func (h *SubmitEblHandler) respRpc2Http(resp *fabric_ebl.SubmitEblResp) *model.SubmitEblData {
-	return &model.SubmitEblData{
+func (h *OperateEblHandler) respRpc2Http(resp *fabric_ebl.OperateEblResp) *model.OperateEblData {
+	return &model.OperateEblData{
 		Id: &resp.Id,
 	}
 }
-func (h *SubmitEblHandler) reqHttp2Rpc(req *model.SubmitEblReq, token string) *fabric_ebl.SubmitEblReq {
-	return &fabric_ebl.SubmitEblReq{
+func (h *OperateEblHandler) reqHttp2Rpc(req *model.OperateEblReq, token string) *fabric_ebl.OperateEblReq {
+	return &fabric_ebl.OperateEblReq{
 		EblNo: *req.EblNo,
 		Token: token,
 	}
 }
 
-func (h *SubmitEblHandler) ReturnResp(status *Status.Status, err error) {
+func (h *OperateEblHandler) ReturnResp(status *Status.Status, err error) {
 	if err != nil {
-		logger.CtxErrorf(h.ctx, "SubmitEbl failed, err = %v", err)
+		logger.CtxErrorf(h.ctx, "OperateEbl failed, err = %v", err)
 	}
-	resp := new(model.SubmitEblResp)
+	resp := new(model.OperateEblResp)
 	resp.Code = status.Code()
 	resp.Message = status.Message()
 	if status.Code() == Status.Success.Code() && err == nil {

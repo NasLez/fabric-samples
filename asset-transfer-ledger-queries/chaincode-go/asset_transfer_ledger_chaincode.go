@@ -296,7 +296,7 @@ func (t *SimpleChaincode) CreateEbl(ctx contractapi.TransactionContextInterface,
 	return nil
 }
 
-func (t *SimpleChaincode) SubmitEbl(ctx contractapi.TransactionContextInterface, eblNo string) error {
+func (t *SimpleChaincode) SubmitEbl(ctx contractapi.TransactionContextInterface, eblNo string, file string, transferCompanyID string, transferCompanyName string, companyName string, companyID int64) error {
 	ebl, err := t.ReadEbl(ctx, eblNo)
 	if err != nil {
 		return err
@@ -304,6 +304,60 @@ func (t *SimpleChaincode) SubmitEbl(ctx contractapi.TransactionContextInterface,
 
 	// Update the EBL status to "Submitted"
 	ebl.Status = "Submitted"
+
+	// Marshal the EBL struct into JSON bytes
+	eblBytes, err := json.Marshal(ebl)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(eblNo, eblBytes)
+}
+
+func (t *SimpleChaincode) ApproveEbl(ctx contractapi.TransactionContextInterface, eblNo string, file string, transferCompanyID string, transferCompanyName string, companyName string, companyID int64) error {
+	ebl, err := t.ReadEbl(ctx, eblNo)
+	if err != nil {
+		return err
+	}
+
+	// Update the EBL status to "Approved"
+	ebl.Status = "Approved"
+
+	// Marshal the EBL struct into JSON bytes
+	eblBytes, err := json.Marshal(ebl)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(eblNo, eblBytes)
+}
+
+func (t *SimpleChaincode) RejectEbl(ctx contractapi.TransactionContextInterface, eblNo string, file string, transferCompanyID string, transferCompanyName string, companyName string, companyID int64) error {
+	ebl, err := t.ReadEbl(ctx, eblNo)
+	if err != nil {
+		return err
+	}
+
+	// Update the EBL status to "Rejected"
+	ebl.Status = "Rejected"
+
+	// Marshal the EBL struct into JSON bytes
+	eblBytes, err := json.Marshal(ebl)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(eblNo, eblBytes)
+}
+
+func (t *SimpleChaincode) RetreatEbl(ctx contractapi.TransactionContextInterface, eblNo string, file string, transferCompanyID string, transferCompanyName string, companyName string, companyID int64) error {
+	ebl, err := t.ReadEbl(ctx, eblNo)
+	if err != nil {
+		return err
+	}
+
+	// Update the EBL status to "Retreated"
+	ebl.Status = "Created"
 
 	// Marshal the EBL struct into JSON bytes
 	eblBytes, err := json.Marshal(ebl)

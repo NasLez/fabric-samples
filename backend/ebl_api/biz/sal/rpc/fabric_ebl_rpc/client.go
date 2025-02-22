@@ -73,10 +73,10 @@ func QueryEblList(ctx context.Context, rpc *fabric_ebl.QueryEblListReq) (resp *f
 	return resp, nil
 }
 
-func SubmitEbl(ctx context.Context, rpc *fabric_ebl.SubmitEblReq) (resp *fabric_ebl.SubmitEblResp, err error) {
-	resp, err = client.SubmitEbl(ctx, rpc)
+func OperateEbl(ctx context.Context, rpc *fabric_ebl.OperateEblReq) (resp *fabric_ebl.OperateEblResp, err error) {
+	resp, err = client.OperateEbl(ctx, rpc)
 	if err != nil {
-		logger.CtxErrorf(ctx, "SubmitEbl error = %v", err)
+		logger.CtxErrorf(ctx, "OperateEbl error = %v", err)
 		return nil, err
 	}
 	return resp, nil
