@@ -19,7 +19,7 @@ func modelGenerator() {
 		Mode:          gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
 	})
 
-	db, _ := gorm.Open(mysql.Open("root:mysql_Grm7Rm@tcp(172.24.79.196:3306)/fabric_ipfs?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	db, _ := gorm.Open(mysql.Open("root:mysql_Grm7Rm@tcp(172.24.79.196:3306)/fabric_ebl?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	g.UseDB(db)
 
 	g.GenerateModelAs("users", "UserPO", gen.FieldGenType("deleted_at", "gorm.DeletedAt"))
@@ -35,7 +35,7 @@ func queryGenerator() {
 		Mode:          gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
 	})
 
-	db, _ := gorm.Open(mysql.Open("root:mysql_Grm7Rm@tcp(172.24.79.196:3306)/fabric_ipfs?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	db, _ := gorm.Open(mysql.Open("root:mysql_Grm7Rm@tcp(172.24.79.196:3306)/fabric_ebl?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	g.UseDB(db)
 
 	g.ApplyBasic(model.UserPO{})

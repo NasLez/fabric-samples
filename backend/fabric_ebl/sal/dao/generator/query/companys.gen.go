@@ -31,7 +31,7 @@ func newCompanyPO(db *gorm.DB, opts ...gen.DOOption) companyPO {
 	_companyPO.Name = field.NewString(tableName, "name")
 	_companyPO.Code = field.NewString(tableName, "code")
 	_companyPO.Type = field.NewInt64(tableName, "type")
-	_companyPO.Seal = field.NewString(tableName, "seal")
+	_companyPO.Seal = field.NewBytes(tableName, "seal")
 	_companyPO.Balance = field.NewFloat64(tableName, "balance")
 	_companyPO.Extra = field.NewString(tableName, "extra")
 	_companyPO.CreatedAt = field.NewInt64(tableName, "created_at")
@@ -51,7 +51,7 @@ type companyPO struct {
 	Name      field.String
 	Code      field.String
 	Type      field.Int64
-	Seal      field.String
+	Seal      field.Bytes
 	Balance   field.Float64
 	Extra     field.String
 	CreatedAt field.Int64
@@ -77,7 +77,7 @@ func (c *companyPO) updateTableName(table string) *companyPO {
 	c.Name = field.NewString(table, "name")
 	c.Code = field.NewString(table, "code")
 	c.Type = field.NewInt64(table, "type")
-	c.Seal = field.NewString(table, "seal")
+	c.Seal = field.NewBytes(table, "seal")
 	c.Balance = field.NewFloat64(table, "balance")
 	c.Extra = field.NewString(table, "extra")
 	c.CreatedAt = field.NewInt64(table, "created_at")

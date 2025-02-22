@@ -12,7 +12,7 @@ type CompanyPO struct {
 	Name      string  `gorm:"column:name;not null" json:"name"`
 	Code      string  `gorm:"column:code;not null" json:"code"`
 	Type      int64   `gorm:"column:type;not null" json:"type"`
-	Seal      *string `gorm:"column:seal" json:"seal"`
+	Seal      *[]byte `gorm:"column:seal" json:"seal"`
 	Balance   float64 `gorm:"column:balance;not null" json:"balance"`
 	Extra     *string `gorm:"column:extra" json:"extra"`
 	CreatedAt int64   `gorm:"column:created_at;not null" json:"created_at"`

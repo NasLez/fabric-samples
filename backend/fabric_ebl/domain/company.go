@@ -4,7 +4,7 @@ type CompanyDO struct {
 	ID        int64
 	Name      string
 	Code      string
-	Seal      *string
+	Seal      *[]byte
 	Balance   float64
 	Type      int64
 	Extra     *string
