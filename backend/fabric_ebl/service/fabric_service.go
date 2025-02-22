@@ -75,40 +75,40 @@ func (u FabricEblServiceImpl) UploadSeal(ctx context.Context, req *fabric_ebl.Up
 func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
-	//contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
-	//defer gwc()
-	//log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
-	//result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
-	//if err != nil {
-	//	log.Printf("Failed to Submit transaction: ReadEbl%v\n", err)
-	//	return nil, err
-	//}
-	//ebl := &Ebl{}
-	//err = json.Unmarshal(result, ebl)
-	//if err != nil {
-	//	log.Printf("Failed to unmarshal result: %v\n", err)
-	//	return nil, err
-	//}
-	//if ebl.CompanyID != company.ID {
-	//	log.Println("CompanyID not match")
-	//	return nil, biz_error.CompanyIDNotMatch
-	//}
-	//{
-	//	w := eblOperationMap[req.Type]
-	//	if ebl.Status != w.Status {
-	//		log.Println("Status not match")
-	//		return nil, biz_error.StatusNotMatch
-	//	}
-	//	log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details, transanctionName = ", w.FabricTransaction)
-	//	companyID := strconv.FormatInt(company.ID, 10)
-	//	result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", companyID)
-	//	if err != nil {
-	//		log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
-	//		return &fabric_ebl.OperateEblResp{
-	//			Id: 0,
-	//		}, nil
-	//	}
-	//}
+	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	defer gwc()
+	log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
+	result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
+	if err != nil {
+		log.Printf("Failed to Submit transaction: ReadEbl%v\n", err)
+		return nil, err
+	}
+	ebl := &Ebl{}
+	err = json.Unmarshal(result, ebl)
+	if err != nil {
+		log.Printf("Failed to unmarshal result: %v\n", err)
+		return nil, err
+	}
+	if ebl.CompanyID != company.ID {
+		log.Println("CompanyID not match")
+		return nil, biz_error.CompanyIDNotMatch
+	}
+	{
+		w := eblOperationMap[req.Type]
+		if ebl.Status != w.Status {
+			log.Println("Status not match")
+			return nil, biz_error.StatusNotMatch
+		}
+		log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details, transanctionName = ", w.FabricTransaction)
+		companyID := strconv.FormatInt(company.ID, 10)
+		result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", companyID)
+		if err != nil {
+			log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
+			return &fabric_ebl.OperateEblResp{
+				Id: 0,
+			}, nil
+		}
+	}
 	return &fabric_ebl.OperateEblResp{
 		Id: 1,
 	}, nil
