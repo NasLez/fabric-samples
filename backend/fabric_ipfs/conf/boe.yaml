@@ -1,0 +1,2 @@
+Mysql:
+  Dsn: "root:mysql_Grm7Rm@tcp(172.24.79.196:3306)/fabric_ebl?charset=utf8mb4&parseTime=True&loc=Local"

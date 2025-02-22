@@ -8,11 +8,12 @@ import (
 	"fabric_ebl/domain/converter"
 	"fabric_ebl/repo"
 	"fabric_ebl/sal/jwt"
+	"fabric_ebl/sal/rpc/fabric_ipfs_rpc"
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
-	"github.com/nguyenthenguyen/docx"
 	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ebl"
+	"github.com/wxl-server/idl_gen/kitex_gen/fabric_ipfs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -256,139 +257,107 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		req.Ebl.NotifyPartyCompanyName = notifyPartyCompany.Name
 	}
 
-	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	//if err != nil {
-	//	log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	//}
-	//walletName := company.Name + "_" + user.Name
-	//wallet, err := gateway.NewFileSystemWallet("wallet")
-	//if err != nil {
-	//	log.Println("Failed to create wallet: %v", err)
-	//}
-	//if !wallet.Exists(walletName) {
-	//	err = addUserToWallet(wallet, walletName)
-	//	if err != nil {
-	//		log.Println("Failed to populate wallet contents: %v", err)
-	//	}
-	//}
-	//ccpPath := filepath.Join(
-	//	"..",
-	//	"..",
-	//	"test-network",
-	//	"organizations",
-	//	"peerOrganizations",
-	//	"org1.example.com",
-	//	"connection-org1.yaml",
-	//)
-	//gw, err := gateway.Connect(
-	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-	//	gateway.WithIdentity(wallet, walletName),
-	//)
-	//if err != nil {
-	//	log.Println("Failed to connect to gateway: %v", err)
-	//}
-	//defer gw.Close()
-	//network, err := gw.GetNetwork("mychannel")
-	//if err != nil {
-	//	log.Println("Failed to get network: %v", err)
-	//}
-	//contract := network.GetContract("basic")
-	//log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
+	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	if err != nil {
+		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	}
+	walletName := company.Name + "_" + user.Name
+	wallet, err := gateway.NewFileSystemWallet("wallet")
+	if err != nil {
+		log.Println("Failed to create wallet: %v", err)
+	}
+	if !wallet.Exists(walletName) {
+		err = addUserToWallet(wallet, walletName)
+		if err != nil {
+			log.Println("Failed to populate wallet contents: %v", err)
+		}
+	}
+	ccpPath := filepath.Join(
+		"..",
+		"..",
+		"test-network",
+		"organizations",
+		"peerOrganizations",
+		"org1.example.com",
+		"connection-org1.yaml",
+	)
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, walletName),
+	)
+	if err != nil {
+		log.Println("Failed to connect to gateway: %v", err)
+	}
+	defer gw.Close()
+	network, err := gw.GetNetwork("mychannel")
+	if err != nil {
+		log.Println("Failed to get network: %v", err)
+	}
+	contract := network.GetContract("basic")
+	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
-	//result, err := contract.SubmitTransaction(
-	//	"CreateEbl",                              // chaincode method
-	//	req.Ebl.EblNo,                            // eblNo
-	//	req.Ebl.OriginCompanyID,                  // originCompanyID
-	//	req.Ebl.OriginCompanyName,                // originCompanyName
-	//	req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-	//	req.Ebl.ShipperCompanyName,               // shipperCompanyName
-	//	req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-	//	req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-	//	req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-	//	req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-	//	req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-	//	req.Ebl.OceanVessel,                      // oceanVessel
-	//	req.Ebl.PortOfLoading,                    // portOfLoading
-	//	req.Ebl.PortOfDescharge,                  // portOfDescharge
-	//	req.Ebl.PlaceOfDestination,               // placeOfDestination
-	//	req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-	//	req.Ebl.ShippingMarkes,                   // shippingMarkes
-	//	strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-	//	strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-	//	"",                                       // transferCompanyID
-	//	"",                                       // transferCompanyName
-	//	req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-	//	req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-	//	req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-	//	req.Ebl.DeliveryAgent,                    // deliveryAgent
-	//	req.Ebl.CompanyName,                      // companyName
-	//	req.Ebl.FreightAndCharges,                // freightAndCharges
-	//	req.Ebl.Status,                           // status
-	//	req.Ebl.File,                             // file
-	//	req.Ebl.PlaceOfIssue,                     // placeOfIssue
-	//	strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
-	//	strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
-	//	strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
-	//	strconv.FormatInt(req.Ebl.DateOfIssue, 10),                   // dateOfIssue
-	//	strconv.FormatInt(req.Ebl.ShippedOnBoard, 10),                // shippedOnBoard
-	//	strconv.FormatInt(req.Ebl.NumOfEBL, 10),                      // numOfEBL
-	//	strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10),           // dateOfIssueDeadline
-	//	strconv.FormatInt(req.Ebl.CompanyID, 10),                     // companyID
-	//)
-	//if err != nil {
-	//	log.Println("Failed to Submit transaction: %v", err)
-	//}
-	//log.Println(string(result))
-	//
-	//// 查询交易：读取 EBL
-	//log.Println("--> Evaluate Transaction: ReadEbl, function returns EBL with given eblNo")
-	//result, err = contract.EvaluateTransaction("ReadEbl", req.Ebl.EblNo)
-	//if err != nil {
-	//	log.Println("Failed to evaluate transaction: %v\n", err)
-	//}
-	//log.Println(string(result))
-
 	{
-		r, err := docx.ReadDocxFile("./ebl_template.docx")
-		// 或者从内存中读取
-		// r, err := docx.ReadDocxFromMemory(data io.ReaderAt, size int64)
-
-		// 或从文件系统对象读取：
-		// r, err := docx.ReadDocxFromFS(file string, fs fs.FS)
-
+		resp, err := fabric_ipfs_rpc.CreateEblDocx(ctx, reqHttp2Rpc(req))
 		if err != nil {
-			panic(err)
+			logger.CtxErrorf(ctx, "CreateEblDocx failed, err = %v", err)
+			return nil, err
 		}
-		docx1 := r.Editable()
-		// 类似于Go标准库中的strings.Replace使用方法
-		docx1.Replace("eblNo", req.Ebl.EblNo, -1)
-		docx1.Replace("shipper", req.Ebl.ShipperCompanyName, -1)
-		docx1.Replace("consignee", req.Ebl.ConsigneeCompanyName, -1)
-		docx1.Replace("notifyParty", req.Ebl.NotifyPartyCompanyName, -1)
-		docx1.Replace("placeOfReceipt", req.Ebl.PlaceOfReceipt, -1)
-		docx1.Replace("oceanVessel", req.Ebl.OceanVessel, -1)
-		docx1.Replace("portOfLoading", req.Ebl.PortOfLoading, -1)
-		docx1.Replace("portOfDescharge", req.Ebl.PortOfDescharge, -1)
-		docx1.Replace("placeOfDestination", req.Ebl.PlaceOfDestination, -1)
-		docx1.Replace("placeOfDelivery", req.Ebl.PlaceOfDelivery, -1)
-		docx1.Replace("shippingMarkes", req.Ebl.ShippingMarkes, -1)
-		docx1.Replace("quantityOfPackages", strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), -1)
-		docx1.Replace("kindOfPackagesGW", req.Ebl.KindOfPackagesGW, -1)
-		docx1.Replace("kindOfPackagesM", req.Ebl.KindOfPackagesM, -1)
-		docx1.Replace("descriptionOfGoods", req.Ebl.DescriptionOfGoods, -1)
-		docx1.Replace("grossWeight", strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64), -1)
-		docx1.Replace("measurement", strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64), -1)
-		docx1.Replace("freightAndCharges", req.Ebl.FreightAndCharges, -1)
-		docx1.Replace("placeOfIssue", req.Ebl.PlaceOfIssue, -1)
-		docx1.Replace("dateOfIssue", strconv.FormatInt(req.Ebl.DateOfIssue, 10), -1)
-		docx1.Replace("deliveryAgent", req.Ebl.DeliveryAgent, -1)
-		docx1.Replace("shippedOnBoard", strconv.FormatInt(req.Ebl.ShippedOnBoard, 10), -1)
-		docx1.Replace("numOfEbl", strconv.FormatInt(req.Ebl.NumOfEBL, 10), -1)
-		docx1.Replace("dateOfIssueDeadline", strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10), -1)
-		docx1.WriteToFile("./" + req.Ebl.EblNo + ".docx")
-
+		logger.Infof("CreateEblDocx success, resp = %v", resp.FileHash)
+		req.Ebl.File = resp.FileHash
 	}
+	result, err := contract.SubmitTransaction(
+		"CreateEbl",                              // chaincode method
+		req.Ebl.EblNo,                            // eblNo
+		req.Ebl.OriginCompanyID,                  // originCompanyID
+		req.Ebl.OriginCompanyName,                // originCompanyName
+		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
+		req.Ebl.ShipperCompanyName,               // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
+		req.Ebl.OceanVessel,                      // oceanVessel
+		req.Ebl.PortOfLoading,                    // portOfLoading
+		req.Ebl.PortOfDescharge,                  // portOfDescharge
+		req.Ebl.PlaceOfDestination,               // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
+		req.Ebl.ShippingMarkes,                   // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
+		"",                                       // transferCompanyID
+		"",                                       // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                    // deliveryAgent
+		req.Ebl.CompanyName,                      // companyName
+		req.Ebl.FreightAndCharges,                // freightAndCharges
+		req.Ebl.Status,                           // status
+		req.Ebl.File,                             // file
+		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
+		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
+		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
+		strconv.FormatInt(req.Ebl.DateOfIssue, 10),                   // dateOfIssue
+		strconv.FormatInt(req.Ebl.ShippedOnBoard, 10),                // shippedOnBoard
+		strconv.FormatInt(req.Ebl.NumOfEBL, 10),                      // numOfEBL
+		strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10),           // dateOfIssueDeadline
+		strconv.FormatInt(req.Ebl.CompanyID, 10),                     // companyID
+	)
+	if err != nil {
+		log.Println("Failed to Submit transaction: %v", err)
+	}
+	log.Println(string(result))
+
+	// 查询交易：读取 EBL
+	log.Println("--> Evaluate Transaction: ReadEbl, function returns EBL with given eblNo")
+	result, err = contract.EvaluateTransaction("ReadEbl", req.Ebl.EblNo)
+	if err != nil {
+		log.Println("Failed to evaluate transaction: %v\n", err)
+	}
+	log.Println(string(result))
 	return &fabric_ebl.CreateEblResp{
 		Id: ID,
 	}, nil
@@ -559,6 +528,50 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 	return &fabric_ebl.CreateCompanyResp{
 		Id: userId,
 	}, nil
+}
+
+func reqHttp2Rpc(req *fabric_ebl.CreateEblReq) *fabric_ipfs.CreateEblDocxReq {
+	return &fabric_ipfs.CreateEblDocxReq{
+		Ebl: &fabric_ipfs.CreateEblDocx{
+			EblNo:                  req.Ebl.EblNo,
+			OriginCompanyID:        req.Ebl.OriginCompanyID,
+			OriginCompanyName:      req.Ebl.OriginCompanyName,
+			ShipperCompanyID:       req.Ebl.ShipperCompanyID,
+			ShipperCompanyName:     req.Ebl.ShipperCompanyName,
+			ConsigneeCompanyID:     req.Ebl.ConsigneeCompanyID,
+			ConsigneeCompanyName:   req.Ebl.ConsigneeCompanyName,
+			NotifyPartyCompanyID:   req.Ebl.NotifyPartyCompanyID,
+			NotifyPartyCompanyName: req.Ebl.NotifyPartyCompanyName,
+			PlaceOfReceipt:         req.Ebl.PlaceOfReceipt,
+			OceanVessel:            req.Ebl.OceanVessel,
+			PortOfLoading:          req.Ebl.PortOfLoading,
+			PortOfDescharge:        req.Ebl.PortOfDescharge,
+			PlaceOfDestination:     req.Ebl.PlaceOfDestination,
+			PlaceOfDelivery:        req.Ebl.PlaceOfDelivery,
+			ShippingMarkes:         req.Ebl.ShippingMarkes,
+			QuantityOfPackages:     req.Ebl.QuantityOfPackages,
+			KindOfPackagesGW:       req.Ebl.KindOfPackagesGW,
+			KindOfPackagesM:        req.Ebl.KindOfPackagesM,
+			DescriptionOfGoods:     req.Ebl.DescriptionOfGoods,
+			GrossWeight:            req.Ebl.GrossWeight,
+			Measurement:            req.Ebl.Measurement,
+			FreightAndCharges:      req.Ebl.FreightAndCharges,
+			PlaceOfIssue:           req.Ebl.PlaceOfIssue,
+			DateOfIssue:            req.Ebl.DateOfIssue,
+			ShippedOnBoard:         req.Ebl.ShippedOnBoard,
+			DateOfIssueDeadline:    req.Ebl.DateOfIssueDeadline,
+			NumOfEBL:               req.Ebl.NumOfEBL,
+			CompanyName:            req.Ebl.CompanyName,
+			DeliveryAgent:          req.Ebl.DeliveryAgent,
+			Status:                 req.Ebl.Status,
+			File:                   req.Ebl.File,
+			ContractFiles:          req.Ebl.ContractFiles,
+			InvoiceFiles:           req.Ebl.InvoiceFiles,
+			TransferCompanyID:      req.Ebl.TransferCompanyID,
+			TransferCompanyName:    req.Ebl.TransferCompanyName,
+			CompanyID:              req.Ebl.CompanyID,
+		},
+	}
 }
 
 func addUserToWallet(wallet *gateway.Wallet, username string) error {
