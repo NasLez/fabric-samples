@@ -65,6 +65,7 @@ func (f FabricIpfsServiceImpl) CreateEblDocx(ctx context.Context, req *fabric_ip
 	docx1.Replace("shippedOnBoard", strconv.FormatInt(req.Ebl.ShippedOnBoard, 10), -1)
 	docx1.Replace("numOfEbl", strconv.FormatInt(req.Ebl.NumOfEBL, 10), -1)
 	docx1.Replace("dateOfIssueDeadline", strconv.FormatInt(req.Ebl.DateOfIssueDeadline, 10), -1)
+	docx1.ReplaceImage("Seal.jpg", "./docx/seal.jpg")
 	docx1.WriteToFile("./docx/" + req.Ebl.EblNo + ".docx")
 	raw := Read("./docx/" + req.Ebl.EblNo + ".docx")
 	resp := fabric_ipfs.CreateEblDocxResp{}
