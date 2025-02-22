@@ -50,6 +50,7 @@ func initContainer() {
 	// service
 	{
 		mustProvide(service.NewUserService)
+		mustProvide(service.NewConnectService)
 	}
 
 	// handler
