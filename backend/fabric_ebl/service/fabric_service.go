@@ -40,7 +40,8 @@ type FabricEblService interface {
 
 type Param struct {
 	dig.In
-	FabricEblRepo repo.FabricEblRepo
+	FabricEblRepo  repo.FabricEblRepo
+	ConnectService ConnectService
 }
 
 type FabricEblServiceImpl struct {
@@ -358,43 +359,45 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 		req.Ebl.NotifyPartyCompanyName = notifyPartyCompany.Name
 	}
 
-	err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
-	if err != nil {
-		log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
-	}
-	walletName := company.Name + "_" + user.Name
-	wallet, err := gateway.NewFileSystemWallet("wallet")
-	if err != nil {
-		log.Println("Failed to create wallet: %v", err)
-	}
-	if !wallet.Exists(walletName) {
-		err = addUserToWallet(wallet, walletName)
-		if err != nil {
-			log.Println("Failed to populate wallet contents: %v", err)
-		}
-	}
-	ccpPath := filepath.Join(
-		"..",
-		"..",
-		"test-network",
-		"organizations",
-		"peerOrganizations",
-		"org1.example.com",
-		"connection-org1.yaml",
-	)
-	gw, err := gateway.Connect(
-		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-		gateway.WithIdentity(wallet, walletName),
-	)
-	if err != nil {
-		log.Println("Failed to connect to gateway: %v", err)
-	}
-	defer gw.Close()
-	network, err := gw.GetNetwork("mychannel")
-	if err != nil {
-		log.Println("Failed to get network: %v", err)
-	}
-	contract := network.GetContract("basic")
+	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//if err != nil {
+	//	log.Printf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v\n", err)
+	//}
+	//walletName := company.Name + "_" + user.Name
+	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//if err != nil {
+	//	log.Printf("Failed to create wallet: %v\n", err)
+	//}
+	//if !wallet.Exists(walletName) {
+	//	err = addUserToWallet(wallet, walletName)
+	//	if err != nil {
+	//		log.Printf("Failed to populate wallet contents: %v\n", err)
+	//	}
+	//}
+	//ccpPath := filepath.Join(
+	//	"..",
+	//	"..",
+	//	"test-network",
+	//	"organizations",
+	//	"peerOrganizations",
+	//	"org1.example.com",
+	//	"connection-org1.yaml",
+	//)
+	//gw, err := gateway.Connect(
+	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+	//	gateway.WithIdentity(wallet, walletName),
+	//)
+	//if err != nil {
+	//	log.Println("Failed to connect to gateway: %v", err)
+	//}
+	//defer gw.Close()
+	//network, err := gw.GetNetwork("mychannel")
+	//if err != nil {
+	//	log.Println("Failed to get network: %v", err)
+	//}
+	//contract := network.GetContract("basic")
+	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	defer gwc()
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
 	{
