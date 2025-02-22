@@ -47,23 +47,6 @@ type FabricEblServiceImpl struct {
 }
 
 func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
-	//token := req.Token
-	//claims, err := jwt.ValidateToken(ctx, token)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-	//	return nil, biz_error.ParseTokenError
-	//}
-	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-	//	return nil, err
-	//}
-	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-	//	return nil, err
-	//}
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
@@ -111,23 +94,6 @@ func NewUserService(p Param) FabricEblService {
 }
 
 func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
-	//token := req.Token
-	//claims, err := jwt.ValidateToken(ctx, token)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-	//	return nil, biz_error.ParseTokenError
-	//}
-	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-	//	return nil, err
-	//}
-	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-	//	return nil, err
-	//}
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
@@ -160,23 +126,6 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 }
 
 func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error) {
-	//token := req.Token
-	//claims, err := jwt.ValidateToken(ctx, token)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-	//	return nil, biz_error.ParseTokenError
-	//}
-	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-	//	return nil, err
-	//}
-	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-	//	return nil, err
-	//}
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
@@ -202,23 +151,6 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 }
 
 func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error) {
-	//token := req.Token
-	//claims, err := jwt.ValidateToken(ctx, token)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-	//	return nil, biz_error.ParseTokenError
-	//}
-	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-	//	return nil, err
-	//}
-	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-	//	return nil, err
-	//}
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	{
@@ -350,23 +282,6 @@ func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric
 }
 
 func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {
-	//token := req.Token
-	//claims, err := jwt.ValidateToken(ctx, token)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-	//	return nil, biz_error.ParseTokenError
-	//}
-	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-	//	return nil, err
-	//}
-	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	//if err != nil {
-	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-	//	return nil, err
-	//}
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 	if err != nil {
 		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)

@@ -60,6 +60,7 @@ func (h *OperateEblHandler) reqHttp2Rpc(req *model.OperateEblReq, token string) 
 	return &fabric_ebl.OperateEblReq{
 		EblNo: *req.EblNo,
 		Token: token,
+		Type:  fabric_ebl.OperationType(*req.Type),
 	}
 }
 
