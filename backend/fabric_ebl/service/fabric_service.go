@@ -47,60 +47,24 @@ type FabricEblServiceImpl struct {
 }
 
 func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
-	if err != nil {
-		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-		return nil, err
-	}
-	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//token := req.Token
+	//claims, err := jwt.ValidateToken(ctx, token)
 	//if err != nil {
-	//	log.Printf("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v\n", err)
+	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+	//	return nil, biz_error.ParseTokenError
 	//}
-	//walletName := company.Name + "_" + user.Name
-	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
 	//if err != nil {
-	//	log.Printf("Failed to create wallet: %v\n", err)
+	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//if !wallet.Exists(walletName) {
-	//	err = addUserToWallet(wallet, walletName)
-	//	if err != nil {
-	//		log.Println("Failed to populate wallet contents: %v", err)
-	//	}
-	//}
-	//ccpPath := filepath.Join(
-	//	"..",
-	//	"..",
-	//	"test-network",
-	//	"organizations",
-	//	"peerOrganizations",
-	//	"org1.example.com",
-	//	"connection-org1.yaml",
-	//)
-	//gw, err := gateway.Connect(
-	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-	//	gateway.WithIdentity(wallet, walletName),
-	//)
+	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
 	//if err != nil {
-	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//defer gw.Close()
-	//network, err := gw.GetNetwork("mychannel")
-	//if err != nil {
-	//	log.Printf("Failed to get network: %v\n", err)
-	//}
-	//contract := network.GetContract("basic")
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
@@ -147,60 +111,24 @@ func NewUserService(p Param) FabricEblService {
 }
 
 func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
-	if err != nil {
-		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-		return nil, err
-	}
-	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//token := req.Token
+	//claims, err := jwt.ValidateToken(ctx, token)
 	//if err != nil {
-	//	log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+	//	return nil, biz_error.ParseTokenError
 	//}
-	//walletName := company.Name + "_" + user.Name
-	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
 	//if err != nil {
-	//	log.Println("Failed to create wallet: %v", err)
+	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//if !wallet.Exists(walletName) {
-	//	err = addUserToWallet(wallet, walletName)
-	//	if err != nil {
-	//		log.Println("Failed to populate wallet contents: %v", err)
-	//	}
-	//}
-	//ccpPath := filepath.Join(
-	//	"..",
-	//	"..",
-	//	"test-network",
-	//	"organizations",
-	//	"peerOrganizations",
-	//	"org1.example.com",
-	//	"connection-org1.yaml",
-	//)
-	//gw, err := gateway.Connect(
-	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-	//	gateway.WithIdentity(wallet, walletName),
-	//)
+	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
 	//if err != nil {
-	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//defer gw.Close()
-	//network, err := gw.GetNetwork("mychannel")
-	//if err != nil {
-	//	log.Printf("Failed to get network: %v\n", err)
-	//}
-	//contract := network.GetContract("basic")
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
@@ -232,60 +160,24 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 }
 
 func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
-	if err != nil {
-		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-		return nil, err
-	}
-	//err = os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	//token := req.Token
+	//claims, err := jwt.ValidateToken(ctx, token)
 	//if err != nil {
-	//	log.Println("Error setting DISCOVERY_AS_LOCALHOST environemnt variable: %v", err)
+	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+	//	return nil, biz_error.ParseTokenError
 	//}
-	//walletName := company.Name + "_" + user.Name
-	//wallet, err := gateway.NewFileSystemWallet("wallet")
+	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
 	//if err != nil {
-	//	log.Println("Failed to create wallet: %v", err)
+	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//if !wallet.Exists(walletName) {
-	//	err = addUserToWallet(wallet, walletName)
-	//	if err != nil {
-	//		log.Println("Failed to populate wallet contents: %v", err)
-	//	}
-	//}
-	//ccpPath := filepath.Join(
-	//	"..",
-	//	"..",
-	//	"test-network",
-	//	"organizations",
-	//	"peerOrganizations",
-	//	"org1.example.com",
-	//	"connection-org1.yaml",
-	//)
-	//gw, err := gateway.Connect(
-	//	gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
-	//	gateway.WithIdentity(wallet, walletName),
-	//)
+	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
 	//if err != nil {
-	//	log.Printf("Failed to connect to gateway: %v\n", err)
+	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+	//	return nil, err
 	//}
-	//defer gw.Close()
-	//network, err := gw.GetNetwork("mychannel")
-	//if err != nil {
-	//	log.Printf("Failed to get network: %v\n", err)
-	//}
-	//contract := network.GetContract("basic")
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
@@ -310,23 +202,24 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 }
 
 func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
-	if err != nil {
-		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
-		return nil, err
-	}
+	//token := req.Token
+	//claims, err := jwt.ValidateToken(ctx, token)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+	//	return nil, biz_error.ParseTokenError
+	//}
+	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+	//	return nil, err
+	//}
+	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+	//	return nil, err
+	//}
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
 	{
 		req.Ebl.OriginCompanyID = strconv.FormatInt(company.ID, 10)
@@ -380,36 +273,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	}
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                                                  // chaincode method
-		req.Ebl.EblNo,                                                // eblNo
-		req.Ebl.OriginCompanyID,                                      // originCompanyID
-		req.Ebl.OriginCompanyName,                                    // originCompanyName
-		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
-		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
-		req.Ebl.OceanVessel,                                          // oceanVessel
-		req.Ebl.PortOfLoading,                                        // portOfLoading
-		req.Ebl.PortOfDescharge,                                      // portOfDescharge
-		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
-		req.Ebl.ShippingMarkes,                                       // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
-		"",                                                           // transferCompanyID
-		"",                                                           // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                                        // deliveryAgent
-		req.Ebl.CompanyName,                                          // companyName
-		req.Ebl.FreightAndCharges,                                    // freightAndCharges
-		req.Ebl.Status,                                               // status
-		req.Ebl.File,                                                 // file
-		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
+		"CreateEbl",                              // chaincode method
+		req.Ebl.EblNo,                            // eblNo
+		req.Ebl.OriginCompanyID,                  // originCompanyID
+		req.Ebl.OriginCompanyName,                // originCompanyName
+		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
+		req.Ebl.ShipperCompanyName,               // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
+		req.Ebl.OceanVessel,                      // oceanVessel
+		req.Ebl.PortOfLoading,                    // portOfLoading
+		req.Ebl.PortOfDescharge,                  // portOfDescharge
+		req.Ebl.PlaceOfDestination,               // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
+		req.Ebl.ShippingMarkes,                   // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
+		"",                                       // transferCompanyID
+		"",                                       // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                    // deliveryAgent
+		req.Ebl.CompanyName,                      // companyName
+		req.Ebl.FreightAndCharges,                // freightAndCharges
+		req.Ebl.Status,                           // status
+		req.Ebl.File,                             // file
+		req.Ebl.PlaceOfIssue,                     // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
@@ -457,21 +350,26 @@ func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric
 }
 
 func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {
-	token := req.Token
-	claims, err := jwt.ValidateToken(ctx, token)
+	//token := req.Token
+	//claims, err := jwt.ValidateToken(ctx, token)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+	//	return nil, biz_error.ParseTokenError
+	//}
+	//userId, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	//user, err := u.p.FabricEblRepo.QueryUserById(ctx, userId)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+	//	return nil, err
+	//}
+	//company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	//if err != nil {
+	//	logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+	//	return nil, err
+	//}
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 	if err != nil {
 		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
-		return nil, biz_error.ParseTokenError
-	}
-	user_id, err := strconv.ParseInt(claims["user_id"].(string), 10, 64)
-	user, err := u.p.FabricEblRepo.QueryUserById(ctx, user_id)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
-		return nil, err
-	}
-	company, err := u.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
-	if err != nil {
-		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 		return nil, err
 	}
 	return &fabric_ebl.GetUserInfoResp{

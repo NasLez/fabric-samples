@@ -2,24 +2,56 @@ package service
 
 import (
 	"context"
+	"fabric_ebl/domain"
+	"fabric_ebl/repo"
+	"fabric_ebl/sal/jwt"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"go.uber.org/dig"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 type ConnectService interface {
 	Contract(ctx context.Context, userName string, companyName string) (contract *gateway.Contract, closeFunc CloseFunc, err error)
+	ParseToken(ctx context.Context, req string) (token string, claims map[string]any, userId int64, user *domain.UserDO, company *domain.CompanyDO, err error)
 }
 
 type ConnectServiceParam struct {
 	dig.In
+	FabricEblRepo repo.FabricEblRepo
 }
 
 type ConnectServiceImpl struct {
 	p ConnectServiceParam
+}
+
+func (c ConnectServiceImpl) ParseToken(ctx context.Context, reqToken string) (respToken string, claims map[string]any, userId int64, user *domain.UserDO, company *domain.CompanyDO, err error) {
+	token := reqToken
+	claims, err = jwt.ValidateToken(ctx, token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return "", nil, 0, nil, nil, err
+	}
+	userId, err = strconv.ParseInt(claims["user_id"].(string), 10, 64)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseInt failed, err = %v", err)
+		return "", nil, 0, nil, nil, err
+	}
+	user, err = c.p.FabricEblRepo.QueryUserById(ctx, userId)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryUserById failed, err = %v", err)
+		return "", nil, 0, nil, nil, err
+	}
+	company, err = c.p.FabricEblRepo.QueryCompanyById(ctx, user.CompanyID)
+	if err != nil {
+		logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
+		return "", nil, 0, nil, nil, err
+	}
+	return token, claims, userId, user, company, nil
 }
 
 func (c ConnectServiceImpl) Contract(ctx context.Context, userName string, companyName string) (contract *gateway.Contract, closeFunc CloseFunc, err error) {
