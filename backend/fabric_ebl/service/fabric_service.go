@@ -119,7 +119,7 @@ func (u FabricEblServiceImpl) SubmitEbl(ctx context.Context, req *fabric_ebl.Sub
 		log.Println("CompanyID not match")
 		return nil, biz_error.CompanyIDNotMatch
 	}
-	if ebl.Status != "created" {
+	if ebl.Status != "Created" {
 		log.Println("Status not match")
 		return nil, biz_error.StatusNotMatch
 	}
