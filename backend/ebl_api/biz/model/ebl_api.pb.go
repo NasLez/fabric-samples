@@ -1627,6 +1627,154 @@ func (x *OperateEblData) GetId() int64 {
 	return 0
 }
 
+type UploadSealReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UploadSealReq) Reset() {
+	*x = UploadSealReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadSealReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadSealReq) ProtoMessage() {}
+
+func (x *UploadSealReq) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadSealReq.ProtoReflect.Descriptor instead.
+func (*UploadSealReq) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{24}
+}
+
+type UploadSealResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Code    *int64          `protobuf:"varint,1,req,name=code" form:"code,required" json:"code,required" query:"code,required"`
+	Message *string         `protobuf:"bytes,2,req,name=message" form:"message,required" json:"message,required" query:"message,required"`
+	Data    *UploadSealData `protobuf:"bytes,3,opt,name=data" form:"data" json:"data,omitempty" query:"data"`
+}
+
+func (x *UploadSealResp) Reset() {
+	*x = UploadSealResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadSealResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadSealResp) ProtoMessage() {}
+
+func (x *UploadSealResp) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadSealResp.ProtoReflect.Descriptor instead.
+func (*UploadSealResp) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *UploadSealResp) GetCode() int64 {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return 0
+}
+
+func (x *UploadSealResp) GetMessage() string {
+	if x != nil && x.Message != nil {
+		return *x.Message
+	}
+	return ""
+}
+
+func (x *UploadSealResp) GetData() *UploadSealData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type UploadSealData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id *int64 `protobuf:"varint,1,req,name=id" form:"id,required" json:"id,required" query:"id,required"`
+}
+
+func (x *UploadSealData) Reset() {
+	*x = UploadSealData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ebl_api_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UploadSealData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadSealData) ProtoMessage() {}
+
+func (x *UploadSealData) ProtoReflect() protoreflect.Message {
+	mi := &file_ebl_api_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadSealData.ProtoReflect.Descriptor instead.
+func (*UploadSealData) Descriptor() ([]byte, []int) {
+	return file_ebl_api_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UploadSealData) GetId() int64 {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return 0
+}
+
 type Company struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1641,7 +1789,7 @@ type Company struct {
 func (x *Company) Reset() {
 	*x = Company{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ebl_api_proto_msgTypes[24]
+		mi := &file_ebl_api_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1654,7 +1802,7 @@ func (x *Company) String() string {
 func (*Company) ProtoMessage() {}
 
 func (x *Company) ProtoReflect() protoreflect.Message {
-	mi := &file_ebl_api_proto_msgTypes[24]
+	mi := &file_ebl_api_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1667,7 +1815,7 @@ func (x *Company) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Company.ProtoReflect.Descriptor instead.
 func (*Company) Descriptor() ([]byte, []int) {
-	return file_ebl_api_proto_rawDescGZIP(), []int{24}
+	return file_ebl_api_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *Company) GetId() int64 {
@@ -1745,7 +1893,7 @@ type Ebl struct {
 func (x *Ebl) Reset() {
 	*x = Ebl{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ebl_api_proto_msgTypes[25]
+		mi := &file_ebl_api_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1758,7 +1906,7 @@ func (x *Ebl) String() string {
 func (*Ebl) ProtoMessage() {}
 
 func (x *Ebl) ProtoReflect() protoreflect.Message {
-	mi := &file_ebl_api_proto_msgTypes[25]
+	mi := &file_ebl_api_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1771,7 +1919,7 @@ func (x *Ebl) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ebl.ProtoReflect.Descriptor instead.
 func (*Ebl) Descriptor() ([]byte, []int) {
-	return file_ebl_api_proto_rawDescGZIP(), []int{25}
+	return file_ebl_api_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *Ebl) GetEblNo() string {
@@ -2205,6 +2353,16 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x61, 0x74, 0x65, 0x45, 0x62, 0x6c, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61,
 	0x22, 0x20, 0x0a, 0x0e, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x45, 0x62, 0x6c, 0x44, 0x61,
 	0x74, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x52, 0x02,
+	0x69, 0x64, 0x22, 0x0f, 0x0a, 0x0d, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x65, 0x61, 0x6c,
+	0x52, 0x65, 0x71, 0x22, 0x6b, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x65, 0x61,
+	0x6c, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20,
+	0x02, 0x28, 0x03, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x02, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x12, 0x2b, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x17, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x70, 0x6c, 0x6f,
+	0x61, 0x64, 0x53, 0x65, 0x61, 0x6c, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61,
+	0x22, 0x20, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x65, 0x61, 0x6c, 0x44, 0x61,
+	0x74, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x52, 0x02,
 	0x69, 0x64, 0x22, 0x98, 0x01, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x02, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x21,
 	0x0a, 0x0c, 0x63, 0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02,
@@ -2321,7 +2479,7 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x0a, 0x04, 0x53, 0x65, 0x61, 0x6c, 0x10, 0x05, 0x12, 0x09, 0x0a, 0x05, 0x49, 0x73, 0x73, 0x75,
 	0x65, 0x10, 0x06, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x10, 0x07, 0x12,
 	0x0c, 0x0a, 0x08, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x10, 0x08, 0x12, 0x0a, 0x0a,
-	0x06, 0x52, 0x65, 0x64, 0x65, 0x65, 0x6d, 0x10, 0x09, 0x32, 0xad, 0x05, 0x0a, 0x06, 0x45, 0x62,
+	0x06, 0x52, 0x65, 0x64, 0x65, 0x65, 0x6d, 0x10, 0x09, 0x32, 0x86, 0x06, 0x0a, 0x06, 0x45, 0x62,
 	0x6c, 0x41, 0x70, 0x69, 0x12, 0x3f, 0x0a, 0x05, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x11, 0x2e,
 	0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71,
 	0x1a, 0x12, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e,
@@ -2364,8 +2522,14 @@ var file_ebl_api_proto_rawDesc = []byte{
 	0x2e, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x45, 0x62, 0x6c, 0x52, 0x65, 0x71, 0x1a, 0x17,
 	0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65,
 	0x45, 0x62, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x22, 0x10, 0xd2, 0xc1, 0x18, 0x0c, 0x2f, 0x65, 0x62,
-	0x6c, 0x2f, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x42, 0x13, 0x5a, 0x11, 0x65, 0x62, 0x6c,
-	0x5f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69, 0x7a, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c,
+	0x6c, 0x2f, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x12, 0x57, 0x0a, 0x0a, 0x55, 0x70, 0x6c,
+	0x6f, 0x61, 0x64, 0x53, 0x65, 0x61, 0x6c, 0x12, 0x16, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70,
+	0x69, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x71, 0x1a,
+	0x17, 0x2e, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x53, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x22, 0x18, 0xd2, 0xc1, 0x18, 0x14, 0x2f, 0x63,
+	0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x2f, 0x73, 0x65, 0x61, 0x6c, 0x2f, 0x75, 0x70, 0x6c, 0x6f,
+	0x61, 0x64, 0x42, 0x13, 0x5a, 0x11, 0x65, 0x62, 0x6c, 0x5f, 0x61, 0x70, 0x69, 0x2f, 0x62, 0x69,
+	0x7a, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c,
 }
 
 var (
@@ -2381,7 +2545,7 @@ func file_ebl_api_proto_rawDescGZIP() []byte {
 }
 
 var file_ebl_api_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_ebl_api_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_ebl_api_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_ebl_api_proto_goTypes = []interface{}{
 	(CompanyType)(0),              // 0: ebl_api.CompanyType
 	(UserType)(0),                 // 1: ebl_api.UserType
@@ -2410,8 +2574,11 @@ var file_ebl_api_proto_goTypes = []interface{}{
 	(*OperateEblReq)(nil),         // 24: ebl_api.OperateEblReq
 	(*OperateEblResp)(nil),        // 25: ebl_api.OperateEblResp
 	(*OperateEblData)(nil),        // 26: ebl_api.OperateEblData
-	(*Company)(nil),               // 27: ebl_api.Company
-	(*Ebl)(nil),                   // 28: ebl_api.Ebl
+	(*UploadSealReq)(nil),         // 27: ebl_api.UploadSealReq
+	(*UploadSealResp)(nil),        // 28: ebl_api.UploadSealResp
+	(*UploadSealData)(nil),        // 29: ebl_api.UploadSealData
+	(*Company)(nil),               // 30: ebl_api.Company
+	(*Ebl)(nil),                   // 31: ebl_api.Ebl
 }
 var file_ebl_api_proto_depIdxs = []int32{
 	5,  // 0: ebl_api.LoginResp.data:type_name -> ebl_api.LoginData
@@ -2421,38 +2588,41 @@ var file_ebl_api_proto_depIdxs = []int32{
 	1,  // 4: ebl_api.GetUserInfoData.user_type:type_name -> ebl_api.UserType
 	0,  // 5: ebl_api.GetUserInfoData.company_type:type_name -> ebl_api.CompanyType
 	14, // 6: ebl_api.GetCompanyAllListResp.data:type_name -> ebl_api.GetCompanyAllListData
-	27, // 7: ebl_api.GetCompanyAllListData.company_list:type_name -> ebl_api.Company
-	28, // 8: ebl_api.CreateEblReq.ebl:type_name -> ebl_api.Ebl
+	30, // 7: ebl_api.GetCompanyAllListData.company_list:type_name -> ebl_api.Company
+	31, // 8: ebl_api.CreateEblReq.ebl:type_name -> ebl_api.Ebl
 	17, // 9: ebl_api.CreateEblResp.data:type_name -> ebl_api.CreateEblData
 	20, // 10: ebl_api.QueryAllEblListResp.data:type_name -> ebl_api.QueryAllEblListData
-	28, // 11: ebl_api.QueryAllEblListData.ebl_list:type_name -> ebl_api.Ebl
-	28, // 12: ebl_api.QueryEblListReq.ebl:type_name -> ebl_api.Ebl
+	31, // 11: ebl_api.QueryAllEblListData.ebl_list:type_name -> ebl_api.Ebl
+	31, // 12: ebl_api.QueryEblListReq.ebl:type_name -> ebl_api.Ebl
 	23, // 13: ebl_api.QueryEblListResp.data:type_name -> ebl_api.QueryEblListData
-	28, // 14: ebl_api.QueryEblListData.ebl_list:type_name -> ebl_api.Ebl
+	31, // 14: ebl_api.QueryEblListData.ebl_list:type_name -> ebl_api.Ebl
 	2,  // 15: ebl_api.OperateEblReq.type:type_name -> ebl_api.OperationType
 	26, // 16: ebl_api.OperateEblResp.data:type_name -> ebl_api.OperateEblData
-	0,  // 17: ebl_api.Company.company_type:type_name -> ebl_api.CompanyType
-	3,  // 18: ebl_api.EblApi.Login:input_type -> ebl_api.LoginReq
-	6,  // 19: ebl_api.EblApi.CreateCompany:input_type -> ebl_api.CreateCompanyReq
-	9,  // 20: ebl_api.EblApi.GetUserInfo:input_type -> ebl_api.GetUserInfoReq
-	12, // 21: ebl_api.EblApi.GetCompanyAllList:input_type -> ebl_api.GetCompanyAllListReq
-	15, // 22: ebl_api.EblApi.CreateEbl:input_type -> ebl_api.CreateEblReq
-	18, // 23: ebl_api.EblApi.QueryAllEblList:input_type -> ebl_api.QueryAllEblListReq
-	21, // 24: ebl_api.EblApi.QueryEblList:input_type -> ebl_api.QueryEblListReq
-	24, // 25: ebl_api.EblApi.OperateEbl:input_type -> ebl_api.OperateEblReq
-	4,  // 26: ebl_api.EblApi.Login:output_type -> ebl_api.LoginResp
-	7,  // 27: ebl_api.EblApi.CreateCompany:output_type -> ebl_api.CreateCompanyResp
-	10, // 28: ebl_api.EblApi.GetUserInfo:output_type -> ebl_api.GetUserInfoResp
-	13, // 29: ebl_api.EblApi.GetCompanyAllList:output_type -> ebl_api.GetCompanyAllListResp
-	16, // 30: ebl_api.EblApi.CreateEbl:output_type -> ebl_api.CreateEblResp
-	19, // 31: ebl_api.EblApi.QueryAllEblList:output_type -> ebl_api.QueryAllEblListResp
-	22, // 32: ebl_api.EblApi.QueryEblList:output_type -> ebl_api.QueryEblListResp
-	25, // 33: ebl_api.EblApi.OperateEbl:output_type -> ebl_api.OperateEblResp
-	26, // [26:34] is the sub-list for method output_type
-	18, // [18:26] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	29, // 17: ebl_api.UploadSealResp.data:type_name -> ebl_api.UploadSealData
+	0,  // 18: ebl_api.Company.company_type:type_name -> ebl_api.CompanyType
+	3,  // 19: ebl_api.EblApi.Login:input_type -> ebl_api.LoginReq
+	6,  // 20: ebl_api.EblApi.CreateCompany:input_type -> ebl_api.CreateCompanyReq
+	9,  // 21: ebl_api.EblApi.GetUserInfo:input_type -> ebl_api.GetUserInfoReq
+	12, // 22: ebl_api.EblApi.GetCompanyAllList:input_type -> ebl_api.GetCompanyAllListReq
+	15, // 23: ebl_api.EblApi.CreateEbl:input_type -> ebl_api.CreateEblReq
+	18, // 24: ebl_api.EblApi.QueryAllEblList:input_type -> ebl_api.QueryAllEblListReq
+	21, // 25: ebl_api.EblApi.QueryEblList:input_type -> ebl_api.QueryEblListReq
+	24, // 26: ebl_api.EblApi.OperateEbl:input_type -> ebl_api.OperateEblReq
+	27, // 27: ebl_api.EblApi.UploadSeal:input_type -> ebl_api.UploadSealReq
+	4,  // 28: ebl_api.EblApi.Login:output_type -> ebl_api.LoginResp
+	7,  // 29: ebl_api.EblApi.CreateCompany:output_type -> ebl_api.CreateCompanyResp
+	10, // 30: ebl_api.EblApi.GetUserInfo:output_type -> ebl_api.GetUserInfoResp
+	13, // 31: ebl_api.EblApi.GetCompanyAllList:output_type -> ebl_api.GetCompanyAllListResp
+	16, // 32: ebl_api.EblApi.CreateEbl:output_type -> ebl_api.CreateEblResp
+	19, // 33: ebl_api.EblApi.QueryAllEblList:output_type -> ebl_api.QueryAllEblListResp
+	22, // 34: ebl_api.EblApi.QueryEblList:output_type -> ebl_api.QueryEblListResp
+	25, // 35: ebl_api.EblApi.OperateEbl:output_type -> ebl_api.OperateEblResp
+	28, // 36: ebl_api.EblApi.UploadSeal:output_type -> ebl_api.UploadSealResp
+	28, // [28:37] is the sub-list for method output_type
+	19, // [19:28] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_ebl_api_proto_init() }
@@ -2750,7 +2920,7 @@ func file_ebl_api_proto_init() {
 			}
 		}
 		file_ebl_api_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Company); i {
+			switch v := v.(*UploadSealReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2762,6 +2932,42 @@ func file_ebl_api_proto_init() {
 			}
 		}
 		file_ebl_api_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadSealResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UploadSealData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Company); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ebl_api_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Ebl); i {
 			case 0:
 				return &v.state
@@ -2780,7 +2986,7 @@ func file_ebl_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ebl_api_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   26,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

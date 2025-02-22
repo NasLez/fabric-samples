@@ -75,3 +75,13 @@ func _operateeblMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _sealMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _uploadsealMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

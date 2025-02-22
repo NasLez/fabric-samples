@@ -34,6 +34,7 @@ type FabricEblService interface {
 	QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error)
 	QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error)
 	OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error)
+	UploadSeal(ctx context.Context, req *fabric_ebl.UploadSealReq) (*fabric_ebl.UploadSealResp, error)
 }
 
 type Param struct {
@@ -46,43 +47,68 @@ type FabricEblServiceImpl struct {
 	p Param
 }
 
+func (u FabricEblServiceImpl) UploadSeal(ctx context.Context, req *fabric_ebl.UploadSealReq) (*fabric_ebl.UploadSealResp, error) {
+	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	if err != nil {
+		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
+		return nil, err
+	}
+	if fabric_ebl.UserType(user.Type) != fabric_ebl.UserType_Admin {
+		logger.CtxErrorf(ctx, "user type not match, userType = %v", user.Type)
+		return nil, biz_error.UserTypeNotMatch
+	}
+	seal := make([]byte, 0)
+	for _, file := range req.Seal {
+		seal = append(seal, byte(file))
+	}
+	company.Seal = &seal
+	err = u.p.FabricEblRepo.UpdateCompanySeal(ctx, company)
+	if err != nil {
+		logger.CtxErrorf(ctx, "UpdateCompanySeal failed, err = %v", err)
+		return nil, err
+	}
+	return &fabric_ebl.UploadSealResp{
+		Id: 1,
+	}, nil
+}
+
 func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
 	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
 
-	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
-	defer gwc()
-	log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
-	result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
-	if err != nil {
-		log.Printf("Failed to Submit transaction: ReadEbl%v\n", err)
-		return nil, err
-	}
-	ebl := &Ebl{}
-	err = json.Unmarshal(result, ebl)
-	if err != nil {
-		log.Printf("Failed to unmarshal result: %v\n", err)
-		return nil, err
-	}
-	if ebl.CompanyID != company.ID {
-		log.Println("CompanyID not match")
-		return nil, biz_error.CompanyIDNotMatch
-	}
-	{
-		w := eblOperationMap[req.Type]
-		if ebl.Status != w.Status {
-			log.Println("Status not match")
-			return nil, biz_error.StatusNotMatch
-		}
-		log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details, transanctionName = ", w.FabricTransaction)
-		companyID := strconv.FormatInt(company.ID, 10)
-		result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", companyID)
-		if err != nil {
-			log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
-			return &fabric_ebl.OperateEblResp{
-				Id: 0,
-			}, nil
-		}
-	}
+	//contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	//defer gwc()
+	//log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
+	//result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
+	//if err != nil {
+	//	log.Printf("Failed to Submit transaction: ReadEbl%v\n", err)
+	//	return nil, err
+	//}
+	//ebl := &Ebl{}
+	//err = json.Unmarshal(result, ebl)
+	//if err != nil {
+	//	log.Printf("Failed to unmarshal result: %v\n", err)
+	//	return nil, err
+	//}
+	//if ebl.CompanyID != company.ID {
+	//	log.Println("CompanyID not match")
+	//	return nil, biz_error.CompanyIDNotMatch
+	//}
+	//{
+	//	w := eblOperationMap[req.Type]
+	//	if ebl.Status != w.Status {
+	//		log.Println("Status not match")
+	//		return nil, biz_error.StatusNotMatch
+	//	}
+	//	log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details, transanctionName = ", w.FabricTransaction)
+	//	companyID := strconv.FormatInt(company.ID, 10)
+	//	result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", companyID)
+	//	if err != nil {
+	//		log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
+	//		return &fabric_ebl.OperateEblResp{
+	//			Id: 0,
+	//		}, nil
+	//	}
+	//}
 	return &fabric_ebl.OperateEblResp{
 		Id: 1,
 	}, nil
@@ -206,36 +232,36 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 	}
 	log.Println("--> Submit Transaction: CreateEbl, creates new EBL with provided details")
 	result, err := contract.SubmitTransaction(
-		"CreateEbl",                              // chaincode method
-		req.Ebl.EblNo,                            // eblNo
-		req.Ebl.OriginCompanyID,                  // originCompanyID
-		req.Ebl.OriginCompanyName,                // originCompanyName
-		req.Ebl.ShipperCompanyID,                 // shipperCompanyID
-		req.Ebl.ShipperCompanyName,               // shipperCompanyName
-		req.Ebl.ConsigneeCompanyID,               // consigneeCompanyID
-		req.Ebl.ConsigneeCompanyName,             // consigneeCompanyName
-		req.Ebl.NotifyPartyCompanyID,             // notifyPartyCompanyID
-		req.Ebl.NotifyPartyCompanyName,           // notifyPartyCompanyName
-		req.Ebl.PlaceOfReceipt,                   // placeOfReceipt
-		req.Ebl.OceanVessel,                      // oceanVessel
-		req.Ebl.PortOfLoading,                    // portOfLoading
-		req.Ebl.PortOfDescharge,                  // portOfDescharge
-		req.Ebl.PlaceOfDestination,               // placeOfDestination
-		req.Ebl.PlaceOfDelivery,                  // placeOfDelivery
-		req.Ebl.ShippingMarkes,                   // shippingMarkes
-		strings.Join(req.Ebl.ContractFiles, ";"), // contractFiles (can be a file or file path)
-		strings.Join(req.Ebl.InvoiceFiles, ";"),  // invoiceFiles (can be a file or file path)
-		"",                                       // transferCompanyID
-		"",                                       // transferCompanyName
-		req.Ebl.KindOfPackagesGW,                 // kindOfPackagesGW
-		req.Ebl.KindOfPackagesM,                  // kindOfPackagesM
-		req.Ebl.DescriptionOfGoods,               // descriptionOfGoods
-		req.Ebl.DeliveryAgent,                    // deliveryAgent
-		req.Ebl.CompanyName,                      // companyName
-		req.Ebl.FreightAndCharges,                // freightAndCharges
-		req.Ebl.Status,                           // status
-		req.Ebl.File,                             // file
-		req.Ebl.PlaceOfIssue,                     // placeOfIssue
+		"CreateEbl",                                                  // chaincode method
+		req.Ebl.EblNo,                                                // eblNo
+		req.Ebl.OriginCompanyID,                                      // originCompanyID
+		req.Ebl.OriginCompanyName,                                    // originCompanyName
+		req.Ebl.ShipperCompanyID,                                     // shipperCompanyID
+		req.Ebl.ShipperCompanyName,                                   // shipperCompanyName
+		req.Ebl.ConsigneeCompanyID,                                   // consigneeCompanyID
+		req.Ebl.ConsigneeCompanyName,                                 // consigneeCompanyName
+		req.Ebl.NotifyPartyCompanyID,                                 // notifyPartyCompanyID
+		req.Ebl.NotifyPartyCompanyName,                               // notifyPartyCompanyName
+		req.Ebl.PlaceOfReceipt,                                       // placeOfReceipt
+		req.Ebl.OceanVessel,                                          // oceanVessel
+		req.Ebl.PortOfLoading,                                        // portOfLoading
+		req.Ebl.PortOfDescharge,                                      // portOfDescharge
+		req.Ebl.PlaceOfDestination,                                   // placeOfDestination
+		req.Ebl.PlaceOfDelivery,                                      // placeOfDelivery
+		req.Ebl.ShippingMarkes,                                       // shippingMarkes
+		strings.Join(req.Ebl.ContractFiles, ";"),                     // contractFiles (can be a file or file path)
+		strings.Join(req.Ebl.InvoiceFiles, ";"),                      // invoiceFiles (can be a file or file path)
+		"",                                                           // transferCompanyID
+		"",                                                           // transferCompanyName
+		req.Ebl.KindOfPackagesGW,                                     // kindOfPackagesGW
+		req.Ebl.KindOfPackagesM,                                      // kindOfPackagesM
+		req.Ebl.DescriptionOfGoods,                                   // descriptionOfGoods
+		req.Ebl.DeliveryAgent,                                        // deliveryAgent
+		req.Ebl.CompanyName,                                          // companyName
+		req.Ebl.FreightAndCharges,                                    // freightAndCharges
+		req.Ebl.Status,                                               // status
+		req.Ebl.File,                                                 // file
+		req.Ebl.PlaceOfIssue,                                         // placeOfIssue
 		strconv.FormatFloat(req.Ebl.QuantityOfPackages, 'f', -1, 64), // quantityOfPackages
 		strconv.FormatFloat(req.Ebl.GrossWeight, 'f', -1, 64),        // grossWeight
 		strconv.FormatFloat(req.Ebl.Measurement, 'f', -1, 64),        // measurement
@@ -783,6 +809,7 @@ type GetEblByRangeWithPaginationResp struct {
 	FetchedRecordsCount int64  `thrift:"fetchedRecordsCount,2,required" frugal:"2,required,string" json:"fetchedRecordsCount"`
 	Bookmark            string `thrift:"bookmark,3,required" frugal:"3,required,string" json:"bookmark"`
 }
+
 type wxl struct {
 	Status            string `json:"status"`
 	FabricTransaction string `json:"fabricTransaction"`

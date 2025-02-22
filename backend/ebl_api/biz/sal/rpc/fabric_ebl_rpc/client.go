@@ -81,3 +81,12 @@ func OperateEbl(ctx context.Context, rpc *fabric_ebl.OperateEblReq) (resp *fabri
 	}
 	return resp, nil
 }
+
+func UploadSeal(ctx context.Context, rpc *fabric_ebl.UploadSealReq) (resp *fabric_ebl.UploadSealResp, err error) {
+	resp, err = client.UploadSeal(ctx, rpc)
+	if err != nil {
+		logger.CtxErrorf(ctx, "UploadSeal error = %v", err)
+		return nil, err
+	}
+	return resp, nil
+}

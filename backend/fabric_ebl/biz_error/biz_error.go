@@ -22,6 +22,7 @@ var (
 	ParseTokenError      = newBizError(1010, "parse token failed")
 	CompanyIDNotMatch    = newBizError(1011, "company id not match")
 	StatusNotMatch       = newBizError(1012, "status not match")
+	UserTypeNotMatch     = newBizError(1013, "user type not match")
 )
 
 func newBizError(code int64, message string) *BizError {

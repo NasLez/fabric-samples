@@ -16,6 +16,10 @@ type Handler struct {
 	p Param
 }
 
+func (s *Handler) UploadSeal(ctx context.Context, req *fabric_ebl.UploadSealReq) (r *fabric_ebl.UploadSealResp, err error) {
+	return s.p.FabricEblService.UploadSeal(ctx, req)
+}
+
 func (s *Handler) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (r *fabric_ebl.OperateEblResp, err error) {
 	return s.p.FabricEblService.OperateEbl(ctx, req)
 }

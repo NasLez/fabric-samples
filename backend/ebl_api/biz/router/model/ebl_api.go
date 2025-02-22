@@ -21,6 +21,10 @@ func Register(r *server.Hertz) {
 		_company := root.Group("/company", _companyMw()...)
 		_company.GET("/all", append(_getcompanyalllistMw(), model.GetCompanyAllList)...)
 		_company.POST("/create", append(_createcompanyMw(), model.CreateCompany)...)
+		{
+			_seal := _company.Group("/seal", _sealMw()...)
+			_seal.POST("/upload", append(_uploadsealMw(), model.UploadSeal)...)
+		}
 	}
 	{
 		_ebl := root.Group("/ebl", _eblMw()...)

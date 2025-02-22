@@ -23,6 +23,7 @@ type FabricEblRepo interface {
 	QueryUserById(ctx context.Context, id int64) (do *domain.UserDO, err error)
 	QueryCompanyById(ctx context.Context, id int64) (do *domain.CompanyDO, err error)
 	QueryCompanyAll(ctx context.Context) (do []domain.QueryCompanyDo, err error)
+	UpdateCompanySeal(ctx context.Context, do *domain.CompanyDO) (err error)
 }
 
 type Param struct {
@@ -31,6 +32,16 @@ type Param struct {
 
 type FabricEblRepoImpl struct {
 	p Param
+}
+
+func (u FabricEblRepoImpl) UpdateCompanySeal(ctx context.Context, do *domain.CompanyDO) (err error) {
+	po := query.Q.CompanyPO
+	_, err = po.WithContext(ctx).Where(po.ID.Eq(do.ID)).Update(po.Seal, do.Seal)
+	if err != nil {
+		logger.CtxErrorf(ctx, "UpdateCompanySeal failed, err = %v", err)
+		return err
+	}
+	return nil
 }
 
 func (u FabricEblRepoImpl) QueryCompanyAll(ctx context.Context) (do []domain.QueryCompanyDo, err error) {

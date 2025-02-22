@@ -56,4 +56,8 @@ var (
 		code:    gptr.Of(int64(1)),
 		message: gptr.Of("submit ebl error"),
 	}
+	UploadSealError = &Status{
+		code:    gptr.Of(int64(1)),
+		message: gptr.Of("upload seal error"),
+	}
 )
