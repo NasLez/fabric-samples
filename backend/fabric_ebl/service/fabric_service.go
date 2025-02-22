@@ -74,7 +74,8 @@ func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.Op
 			return nil, biz_error.StatusNotMatch
 		}
 		log.Println("--> Submit Transaction: OperateEbl, operate EBL with provided details, transanctionName = ", w.FabricTransaction)
-		result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", ebl.CompanyName)
+		companyID := strconv.FormatInt(company.ID, 10)
+		result, err = contract.SubmitTransaction(w.FabricTransaction, req.EblNo, ebl.File, ebl.TransferCompanyID, ebl.TransferCompanyName, "", companyID)
 		if err != nil {
 			log.Printf("Failed to Submit transaction: OperateEbl%v\n", err)
 			return &fabric_ebl.OperateEblResp{
