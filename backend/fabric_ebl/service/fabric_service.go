@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fabric_ebl/biz_error"
 	"fabric_ebl/common/id_gen"
+	"fabric_ebl/domain"
 	"fabric_ebl/domain/converter"
 	"fabric_ebl/repo"
 	"fabric_ebl/sal/jwt"
@@ -16,6 +17,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -44,11 +46,11 @@ type Param struct {
 }
 
 type FabricEblServiceImpl struct {
-	p Param
+	P Param
 }
 
 func (u FabricEblServiceImpl) UploadSeal(ctx context.Context, req *fabric_ebl.UploadSealReq) (*fabric_ebl.UploadSealResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 	if err != nil {
 		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
 		return nil, err
@@ -62,7 +64,7 @@ func (u FabricEblServiceImpl) UploadSeal(ctx context.Context, req *fabric_ebl.Up
 		seal = append(seal, byte(file))
 	}
 	company.Seal = &seal
-	err = u.p.FabricEblRepo.UpdateCompanySeal(ctx, company)
+	err = u.P.FabricEblRepo.UpdateCompanySeal(ctx, company)
 	if err != nil {
 		logger.CtxErrorf(ctx, "UpdateCompanySeal failed, err = %v", err)
 		return nil, err
@@ -73,9 +75,9 @@ func (u FabricEblServiceImpl) UploadSeal(ctx context.Context, req *fabric_ebl.Up
 }
 
 func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.OperateEblReq) (*fabric_ebl.OperateEblResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 
-	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	contract, gwc, err := u.P.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
 	log.Println("--> Submit Transaction: ReadEbl, creates new EBL with provided details")
 	result, err := contract.SubmitTransaction("ReadEbl", req.EblNo)
@@ -116,19 +118,20 @@ func (u FabricEblServiceImpl) OperateEbl(ctx context.Context, req *fabric_ebl.Op
 
 func NewUserService(p Param) FabricEblService {
 	return &FabricEblServiceImpl{
-		p: p,
+		P: p,
 	}
 }
 
 func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.QueryEblListReq) (*fabric_ebl.QueryEblListResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	selector := generateSelectorString(req)
+	logger.CtxInfof(ctx, "selector = %v", selector)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 
-	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	contract, gwc, err := u.P.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
 
 	contractPageSize := strconv.FormatInt(*req.PageSize, 10)
-	selector := generateSelectorString(req)
 	//selector = "{\"selector\":{\"portOfDescharge\":\"Port B\"},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
 	log.Println(selector)
 	result, err := contract.SubmitTransaction("QueryEblWithPagination", selector, contractPageSize, *req.Bookmark)
@@ -153,9 +156,9 @@ func (u FabricEblServiceImpl) QueryEblList(ctx context.Context, req *fabric_ebl.
 }
 
 func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_ebl.QueryAllEblListReq) (*fabric_ebl.QueryAllEblListResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 
-	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	contract, gwc, err := u.P.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
 	log.Println("--> Submit Transaction: GetEblByRangeWithPagination, creates new EBL with provided details")
 
@@ -178,7 +181,7 @@ func (u FabricEblServiceImpl) QueryAllEblList(ctx context.Context, req *fabric_e
 }
 
 func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.CreateEblReq) (*fabric_ebl.CreateEblResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 
 	{
 		req.Ebl.OriginCompanyID = strconv.FormatInt(company.ID, 10)
@@ -190,7 +193,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 
 	{
 		reqShipperCompanyID, err := strconv.ParseInt(req.Ebl.ShipperCompanyID, 10, 64)
-		shipperCompany, err := u.p.FabricEblRepo.QueryCompanyById(ctx, reqShipperCompanyID)
+		shipperCompany, err := u.P.FabricEblRepo.QueryCompanyById(ctx, reqShipperCompanyID)
 		if err != nil {
 			logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 			return nil, err
@@ -200,7 +203,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 
 	{
 		reqConsigneeCompanyID, err := strconv.ParseInt(req.Ebl.ConsigneeCompanyID, 10, 64)
-		consigneeCompany, err := u.p.FabricEblRepo.QueryCompanyById(ctx, reqConsigneeCompanyID)
+		consigneeCompany, err := u.P.FabricEblRepo.QueryCompanyById(ctx, reqConsigneeCompanyID)
 		if err != nil {
 			logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 			return nil, err
@@ -210,14 +213,14 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 
 	{
 		reqNotifyPartyCompanyID, err := strconv.ParseInt(req.Ebl.NotifyPartyCompanyID, 10, 64)
-		notifyPartyCompany, err := u.p.FabricEblRepo.QueryCompanyById(ctx, reqNotifyPartyCompanyID)
+		notifyPartyCompany, err := u.P.FabricEblRepo.QueryCompanyById(ctx, reqNotifyPartyCompanyID)
 		if err != nil {
 			logger.CtxErrorf(ctx, "QueryCompanyById failed, err = %v", err)
 			return nil, err
 		}
 		req.Ebl.NotifyPartyCompanyName = notifyPartyCompany.Name
 	}
-	contract, gwc, err := u.p.ConnectService.Contract(ctx, user.Name, company.Name)
+	contract, gwc, err := u.P.ConnectService.Contract(ctx, user.Name, company.Name)
 	defer gwc()
 	ID, err := id_gen.NextID()
 	req.Ebl.EblNo = strconv.FormatInt(ID, 10)
@@ -289,7 +292,7 @@ func (u FabricEblServiceImpl) CreateEbl(ctx context.Context, req *fabric_ebl.Cre
 }
 
 func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric_ebl.GetCompanyAllListReq) (*fabric_ebl.GetCompanyAllListResp, error) {
-	companyList, err := u.p.FabricEblRepo.QueryCompanyAll(ctx)
+	companyList, err := u.P.FabricEblRepo.QueryCompanyAll(ctx)
 	if err != nil {
 		logger.CtxErrorf(ctx, "QueryCompanyAll failed, err = %v", err)
 		return nil, err
@@ -309,7 +312,7 @@ func (u FabricEblServiceImpl) GetCompanyAllList(ctx context.Context, req *fabric
 }
 
 func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.GetUserInfoReq) (*fabric_ebl.GetUserInfoResp, error) {
-	_, _, _, user, company, err := u.p.ConnectService.ParseToken(ctx, req.Token)
+	_, _, _, user, company, err := u.P.ConnectService.ParseToken(ctx, req.Token)
 	if err != nil {
 		logger.CtxErrorf(ctx, "ParseToken failed, err = %v", err)
 		return nil, err
@@ -327,7 +330,7 @@ func (u FabricEblServiceImpl) GetUserInfo(ctx context.Context, req *fabric_ebl.G
 }
 
 func (u FabricEblServiceImpl) SignUp(ctx context.Context, req *common_user.SignUpReq) (resp *common_user.SignUpResp, err error) {
-	count, err := u.p.FabricEblRepo.CountUser(ctx, req.Email)
+	count, err := u.P.FabricEblRepo.CountUser(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +338,7 @@ func (u FabricEblServiceImpl) SignUp(ctx context.Context, req *common_user.SignU
 		logger.CtxErrorf(ctx, "sign up failed, email has been used, email = %s", req.Email)
 		return nil, biz_error.SignUpError
 	}
-	id, err := u.p.FabricEblRepo.CreateUser(ctx, converter.SignUpReqDTO2DO(req))
+	id, err := u.P.FabricEblRepo.CreateUser(ctx, converter.SignUpReqDTO2DO(req))
 	if err != nil {
 		logger.CtxErrorf(ctx, "CreateUser failed, err = %v", err)
 		return nil, err
@@ -350,7 +353,7 @@ func (u FabricEblServiceImpl) UpdatePassword(ctx context.Context, req *common_us
 		logger.CtxErrorf(ctx, "UpdatePassword failed, err = %v", biz_error.UpdatePasswordError)
 		return nil, biz_error.UpdatePasswordError
 	}
-	do, err := u.p.FabricEblRepo.QueryUser(ctx, req.Email)
+	do, err := u.P.FabricEblRepo.QueryUser(ctx, req.Email)
 	if err != nil {
 		logger.CtxErrorf(ctx, "QueryUser failed, err = %v", err)
 		return nil, err
@@ -360,7 +363,7 @@ func (u FabricEblServiceImpl) UpdatePassword(ctx context.Context, req *common_us
 		return nil, biz_error.UpdatePasswordError2
 	}
 	do.Password = req.Password
-	err = u.p.FabricEblRepo.UpdatePassword(ctx, do)
+	err = u.P.FabricEblRepo.UpdatePassword(ctx, do)
 	if err != nil {
 		logger.CtxErrorf(ctx, "UpdatePassword failed, err = %v", err)
 		return nil, err
@@ -369,7 +372,7 @@ func (u FabricEblServiceImpl) UpdatePassword(ctx context.Context, req *common_us
 }
 
 func (u FabricEblServiceImpl) Login(ctx context.Context, req *fabric_ebl.LoginReq) (resp *fabric_ebl.LoginResp, err error) {
-	do, err := u.p.FabricEblRepo.QueryUser(ctx, req.Email)
+	do, err := u.P.FabricEblRepo.QueryUser(ctx, req.Email)
 	if err != nil {
 		logger.CtxErrorf(ctx, "QueryUser failed, err = %v", err)
 		return nil, biz_error.LoginError
@@ -390,7 +393,7 @@ func (u FabricEblServiceImpl) Login(ctx context.Context, req *fabric_ebl.LoginRe
 
 func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl.CreateCompanyReq) (resp *fabric_ebl.CreateCompanyResp, err error) {
 	{
-		count, err := u.p.FabricEblRepo.CountCompanyByCode(ctx, req.CompanyCode)
+		count, err := u.P.FabricEblRepo.CountCompanyByCode(ctx, req.CompanyCode)
 		if err != nil {
 			logger.CtxErrorf(ctx, "QueryCompanyByCode failed, err = %v", err)
 			return nil, err
@@ -401,7 +404,7 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 		}
 	}
 	{
-		count, err := u.p.FabricEblRepo.CountUser(ctx, req.AdminEmail)
+		count, err := u.P.FabricEblRepo.CountUser(ctx, req.AdminEmail)
 		if err != nil {
 			logger.CtxErrorf(ctx, "QueryUser failed, err = %v", err)
 			return nil, err
@@ -411,12 +414,12 @@ func (u FabricEblServiceImpl) CreateCompany(ctx context.Context, req *fabric_ebl
 			return nil, biz_error.CreateCompanyError2
 		}
 	}
-	companyId, err := u.p.FabricEblRepo.CreateCompany(ctx, converter.CreateCompanyReqDTO2DO(req))
+	companyId, err := u.P.FabricEblRepo.CreateCompany(ctx, converter.CreateCompanyReqDTO2DO(req))
 	if err != nil {
 		logger.CtxErrorf(ctx, "CreateCompany failed, err = %v", err)
 		return nil, err
 	}
-	userId, err := u.p.FabricEblRepo.CreateUser(ctx, converter.CreateCompanyReqDTO2UserDO(req, companyId))
+	userId, err := u.P.FabricEblRepo.CreateUser(ctx, converter.CreateCompanyReqDTO2UserDO(req, companyId))
 	if err != nil {
 		logger.CtxErrorf(ctx, "CreateUser failed, err = %v", err)
 		return nil, err
@@ -530,183 +533,207 @@ func addUserToWallet(wallet *gateway.Wallet, username string) error {
 }
 
 func generateSelectorString(req *fabric_ebl.QueryEblListReq) string {
-	types := 0
-	selector := "{\"selector\":{"
-	if req.EblFilter.EblNo != "" {
-		selector += "\"eblNo\":\"" + req.EblFilter.EblNo + "\""
-		types++
+	eblSelector := domain.EblSelector{
+		Selector: make(map[string]string),
+		UserIndex: []string{
+			"_design/indexEblDoc",
+			"indexEbl",
+		},
 	}
-	if req.EblFilter.OriginCompanyID != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"originCompanyID\":\"" + req.EblFilter.OriginCompanyID + "\""
-		types++
-	}
-	if req.EblFilter.ShipperCompanyID != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"shipperCompanyID\":\"" + req.EblFilter.ShipperCompanyID + "\""
-		types++
-	}
-	if req.EblFilter.ConsigneeCompanyID != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"consigneeCompanyID\":\"" + req.EblFilter.ConsigneeCompanyID + "\""
-		types++
-	}
-	if req.EblFilter.NotifyPartyCompanyID != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"notifyPartyCompanyID\":\"" + req.EblFilter.NotifyPartyCompanyID + "\""
-		types++
-	}
-	if req.EblFilter.PortOfDescharge != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"portOfDescharge\":\"" + req.EblFilter.PortOfDescharge + "\""
-		types++
-	}
-	if req.EblFilter.Status != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"status\":\"" + req.EblFilter.Status + "\""
-		types++
-	}
-	if req.EblFilter.CompanyID != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"companyID\":" + strconv.FormatInt(req.EblFilter.CompanyID, 10)
-		types++
-	}
-	if req.EblFilter.TransferCompanyID != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"transferCompanyID\":\"" + req.EblFilter.TransferCompanyID + "\""
-		types++
-	}
-	if req.EblFilter.DateOfIssue != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"dateOfIssue\":" + strconv.FormatInt(req.EblFilter.DateOfIssue, 10)
-		types++
-	}
-	if req.EblFilter.ShippedOnBoard != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"shippedOnBoard\":" + strconv.FormatInt(req.EblFilter.ShippedOnBoard, 10)
-		types++
-	}
-	if req.EblFilter.DateOfIssueDeadline != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"dateOfIssueDeadline\":" + strconv.FormatInt(req.EblFilter.DateOfIssueDeadline, 10)
-		types++
-	}
-	if req.EblFilter.QuantityOfPackages != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"quantityOfPackages\":" + strconv.FormatFloat(req.EblFilter.QuantityOfPackages, 'f', -1, 64)
-		types++
-	}
-	if req.EblFilter.GrossWeight != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"grossWeight\":" + strconv.FormatFloat(req.EblFilter.GrossWeight, 'f', -1, 64)
-		types++
-	}
-	if req.EblFilter.Measurement != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"measurement\":" + strconv.FormatFloat(req.EblFilter.Measurement, 'f', -1, 64)
-		types++
-	}
-	if req.EblFilter.NumOfEBL != 0 {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"numOfEbl\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
-		types++
-	}
-	if req.EblFilter.PlaceOfDelivery != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"placeOfDelivery\":\"" + req.EblFilter.PlaceOfDelivery + "\""
-		types++
-	}
-	if req.EblFilter.PlaceOfDestination != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"placeOfDestination\":\"" + req.EblFilter.PlaceOfDestination + "\""
-		types++
-	}
-	if req.EblFilter.PlaceOfIssue != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"placeOfIssue\":\"" + req.EblFilter.PlaceOfIssue + "\""
-		types++
-	}
-	if req.EblFilter.PlaceOfReceipt != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"placeOfReceipt\":\"" + req.EblFilter.PlaceOfReceipt + "\""
-		types++
-	}
-	if req.EblFilter.PortOfLoading != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"portOfLoading\":\"" + req.EblFilter.PortOfLoading + "\""
-		types++
-	}
-	if req.EblFilter.ShippingMarkes != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"shippingMarkes\":\"" + req.EblFilter.ShippingMarkes + "\""
-		types++
-	}
-	if req.EblFilter.FreightAndCharges != "" {
-		if types > 0 {
-			selector += ","
-		}
-		selector += "\"freightAndCharges\":\"" + req.EblFilter.FreightAndCharges + "\""
-		types++
 
-	}
-	if req.EblFilter.DescriptionOfGoods != "" {
-		if types > 0 {
-			selector += ","
+	typeOf := reflect.TypeOf(*req.EblFilter)
+	valueOf := reflect.ValueOf(*req.EblFilter)
+	for i := 0; i < typeOf.NumField(); i++ {
+		field := typeOf.Field(i)
+		value := valueOf.Field(i).Interface()
+		if field.Type.Kind() != reflect.String {
+			sprintf := fmt.Sprintf("%v", value)
+			if len(sprintf) > 0 {
+				eblSelector.Selector[field.Name] = sprintf
+			}
 		}
-		selector += "\"descriptionOfGoods\":\"" + req.EblFilter.DescriptionOfGoods + "\""
-		types++
-	}
-	if req.EblFilter.DeliveryAgent != "" {
-		if types > 0 {
-			selector += ","
+		if field.Type.Kind() == reflect.String && len(value.(string)) > 0 {
+			eblSelector.Selector[field.Name] = value.(string)
 		}
-		selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
-		types++
 	}
-	selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
-	return selector
+	selector, _ := json.Marshal(eblSelector)
+	return string(selector)
+	//selector := "{\"selector\":{"
+	//if req.EblFilter.EblNo != "" {
+	//	selector += "\"eblNo\":\"" + req.EblFilter.EblNo + "\""
+	//	types++
+	//}
+	//if req.EblFilter.OriginCompanyID != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"originCompanyID\":\"" + req.EblFilter.OriginCompanyID + "\""
+	//	types++
+	//}
+	//if req.EblFilter.ShipperCompanyID != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"shipperCompanyID\":\"" + req.EblFilter.ShipperCompanyID + "\""
+	//	types++
+	//}
+	//if req.EblFilter.ConsigneeCompanyID != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"consigneeCompanyID\":\"" + req.EblFilter.ConsigneeCompanyID + "\""
+	//	types++
+	//}
+	//if req.EblFilter.NotifyPartyCompanyID != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"notifyPartyCompanyID\":\"" + req.EblFilter.NotifyPartyCompanyID + "\""
+	//	types++
+	//}
+	//if req.EblFilter.PortOfDescharge != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"portOfDescharge\":\"" + req.EblFilter.PortOfDescharge + "\""
+	//	types++
+	//}
+	//if req.EblFilter.Status != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"status\":\"" + req.EblFilter.Status + "\""
+	//	types++
+	//}
+	//if req.EblFilter.CompanyID != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"companyID\":" + strconv.FormatInt(req.EblFilter.CompanyID, 10)
+	//	types++
+	//}
+	//if req.EblFilter.TransferCompanyID != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"transferCompanyID\":\"" + req.EblFilter.TransferCompanyID + "\""
+	//	types++
+	//}
+	//if req.EblFilter.DateOfIssue != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"dateOfIssue\":" + strconv.FormatInt(req.EblFilter.DateOfIssue, 10)
+	//	types++
+	//}
+	//if req.EblFilter.ShippedOnBoard != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"shippedOnBoard\":" + strconv.FormatInt(req.EblFilter.ShippedOnBoard, 10)
+	//	types++
+	//}
+	//if req.EblFilter.DateOfIssueDeadline != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"dateOfIssueDeadline\":" + strconv.FormatInt(req.EblFilter.DateOfIssueDeadline, 10)
+	//	types++
+	//}
+	//if req.EblFilter.QuantityOfPackages != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"quantityOfPackages\":" + strconv.FormatFloat(req.EblFilter.QuantityOfPackages, 'f', -1, 64)
+	//	types++
+	//}
+	//if req.EblFilter.GrossWeight != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"grossWeight\":" + strconv.FormatFloat(req.EblFilter.GrossWeight, 'f', -1, 64)
+	//	types++
+	//}
+	//if req.EblFilter.Measurement != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"measurement\":" + strconv.FormatFloat(req.EblFilter.Measurement, 'f', -1, 64)
+	//	types++
+	//}
+	//if req.EblFilter.NumOfEBL != 0 {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"numOfEbl\":" + strconv.FormatInt(req.EblFilter.NumOfEBL, 10)
+	//	types++
+	//}
+	//if req.EblFilter.PlaceOfDelivery != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"placeOfDelivery\":\"" + req.EblFilter.PlaceOfDelivery + "\""
+	//	types++
+	//}
+	//if req.EblFilter.PlaceOfDestination != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"placeOfDestination\":\"" + req.EblFilter.PlaceOfDestination + "\""
+	//	types++
+	//}
+	//if req.EblFilter.PlaceOfIssue != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"placeOfIssue\":\"" + req.EblFilter.PlaceOfIssue + "\""
+	//	types++
+	//}
+	//if req.EblFilter.PlaceOfReceipt != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"placeOfReceipt\":\"" + req.EblFilter.PlaceOfReceipt + "\""
+	//	types++
+	//}
+	//if req.EblFilter.PortOfLoading != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"portOfLoading\":\"" + req.EblFilter.PortOfLoading + "\""
+	//	types++
+	//}
+	//if req.EblFilter.ShippingMarkes != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"shippingMarkes\":\"" + req.EblFilter.ShippingMarkes + "\""
+	//	types++
+	//}
+	//if req.EblFilter.FreightAndCharges != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"freightAndCharges\":\"" + req.EblFilter.FreightAndCharges + "\""
+	//	types++
+	//
+	//}
+	//if req.EblFilter.DescriptionOfGoods != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"descriptionOfGoods\":\"" + req.EblFilter.DescriptionOfGoods + "\""
+	//	types++
+	//}
+	//if req.EblFilter.DeliveryAgent != "" {
+	//	if types > 0 {
+	//		selector += ","
+	//	}
+	//	selector += "\"deliveryAgent\":\"" + req.EblFilter.DeliveryAgent + "\""
+	//	types++
+	//}
+	//selector += "},\"use_index\":[\"_design/indexEblDoc\",\"indexEbl\"]}"
+	//return selector
 }
 
 func GetEblByRangeWithPaginationResp2DO(result []byte) (*fabric_ebl.QueryAllEblListResp, error) {
